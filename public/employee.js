@@ -2,7 +2,9 @@
  * NAVBODH - Employee Portal Logic & SPA View Controller
  * 
  * Handles authentication state, employee dashboard, profile editing,
- * competency assessment taking, and assessment results display.
+ * competency assessment taking, assessment results display,
+ * Stage 2 Intelligence (Skill gaps, recommendations, roadmap, study assistant),
+ * and Stage 3 Learning (Course catalog, course detail, lesson reader, persistent progress, quizzes).
  */
 
 (function () {
@@ -16,7 +18,15 @@
     currentAssessment: null,
     assessmentAnswers: {},
     profileData: null,
-    activeTab: 'dashboard'
+    activeTab: 'dashboard',
+    
+    // Stage 3 Learning State
+    currentCourse: null,
+    currentLesson: null,
+    currentQuiz: null,
+    quizAnswers: {},
+    allCourses: [],
+    activeCourseDomainFilter: 'ALL'
   };
 
   // DOM Elements
@@ -28,7 +38,7 @@
     appNavBar: document.getElementById('app-nav-bar'),
     navTabsContainer: document.getElementById('nav-tabs-container'),
     
-    // Views
+    // Core & Intelligence Views
     viewLogin: document.getElementById('view-login'),
     viewEmpDashboard: document.getElementById('view-employee-dashboard'),
     viewEmpProfile: document.getElementById('view-employee-profile'),
@@ -40,6 +50,14 @@
     viewEmpAssistant: document.getElementById('view-employee-assistant'),
     viewAdminDashboard: document.getElementById('view-admin-dashboard'),
     viewPlaceholder: document.getElementById('view-placeholder'),
+
+    // Stage 3 Learning Views
+    viewEmpCourses: document.getElementById('view-employee-courses'),
+    viewCourseDetail: document.getElementById('view-course-detail'),
+    viewLessonDetail: document.getElementById('view-lesson-detail'),
+    viewQuizzesList: document.getElementById('view-quizzes-list'),
+    viewQuizDetail: document.getElementById('view-quiz-detail'),
+    viewQuizResult: document.getElementById('view-quiz-result'),
 
     // Login
     formLogin: document.getElementById('form-login'),
@@ -128,6 +146,67 @@
     formStudyAssistant: document.getElementById('form-study-assistant'),
     inputAssistantQuery: document.getElementById('input-assistant-query'),
 
+    // Stage 3 Learning Elements - Courses
+    crsStatTotal: document.getElementById('crs-stat-total'),
+    crsStatInProgress: document.getElementById('crs-stat-in-progress'),
+    crsStatCompleted: document.getElementById('crs-stat-completed'),
+    crsStatLessonsCompleted: document.getElementById('crs-stat-lessons-completed'),
+    coursesDomainFilters: document.getElementById('courses-domain-filters'),
+    coursesListContainer: document.getElementById('courses-list-container'),
+
+    // Stage 3 Learning Elements - Course Detail
+    btnBackToCourses: document.getElementById('btn-back-to-courses'),
+    courseDetailSourceBadge: document.getElementById('course-detail-source-badge'),
+    courseDetailTitle: document.getElementById('course-detail-title'),
+    courseDetailDomainBadge: document.getElementById('course-detail-domain-badge'),
+    courseDetailMeta: document.getElementById('course-detail-meta'),
+    courseDetailDescription: document.getElementById('course-detail-description'),
+    courseDetailCompetenciesList: document.getElementById('course-detail-competencies-list'),
+    courseDetailProgressLabel: document.getElementById('course-detail-progress-label'),
+    courseDetailProgressBar: document.getElementById('course-detail-progress-bar'),
+    courseDetailLessonsCount: document.getElementById('course-detail-lessons-count'),
+    courseDetailLessonsList: document.getElementById('course-detail-lessons-list'),
+    courseDetailQuizContainer: document.getElementById('course-detail-quiz-container'),
+
+    // Stage 3 Learning Elements - Lesson Detail
+    btnLessonBackToCourse: document.getElementById('btn-lesson-back-to-course'),
+    lessonHeaderBreadcrumb: document.getElementById('lesson-header-breadcrumb'),
+    lessonDetailTitle: document.getElementById('lesson-detail-title'),
+    lessonDetailStatusBadge: document.getElementById('lesson-detail-status-badge'),
+    lessonDetailMeta: document.getElementById('lesson-detail-meta'),
+    lessonContentBody: document.getElementById('lesson-content-body'),
+    lessonMaterialsList: document.getElementById('lesson-materials-list'),
+    lessonCompletionStatusText: document.getElementById('lesson-completion-status-text'),
+    lessonCompletionStatusDesc: document.getElementById('lesson-completion-status-desc'),
+    btnMarkLessonComplete: document.getElementById('btn-mark-lesson-complete'),
+    btnLessonPrev: document.getElementById('btn-lesson-prev'),
+    btnLessonNext: document.getElementById('btn-lesson-next'),
+
+    // Stage 3 Learning Elements - Quizzes Hub
+    quizzesGridContainer: document.getElementById('quizzes-grid-container'),
+
+    // Stage 3 Learning Elements - Quiz Detail
+    btnQuizCancel: document.getElementById('btn-quiz-cancel'),
+    quizDetailTitle: document.getElementById('quiz-detail-title'),
+    quizPassMarkBadge: document.getElementById('quiz-pass-mark-badge'),
+    quizDetailDescription: document.getElementById('quiz-detail-description'),
+    quizProgressBar: document.getElementById('quiz-progress-bar'),
+    quizProgressText: document.getElementById('quiz-progress-text'),
+    formQuiz: document.getElementById('form-quiz'),
+    quizQuestionsContainer: document.getElementById('quiz-questions-container'),
+    btnCancelQuizForm: document.getElementById('btn-cancel-quiz-form'),
+
+    // Stage 3 Learning Elements - Quiz Result
+    quizResultTitle: document.getElementById('quiz-result-title'),
+    quizResultPassBadge: document.getElementById('quiz-result-pass-badge'),
+    quizResStatScore: document.getElementById('quiz-res-stat-score'),
+    quizResStatPassDesc: document.getElementById('quiz-res-stat-pass-desc'),
+    quizResStatCorrect: document.getElementById('quiz-res-stat-correct'),
+    quizReviewContainer: document.getElementById('quiz-review-container'),
+    btnQuizResToCourse: document.getElementById('btn-quiz-res-to-course'),
+    btnQuizResRetake: document.getElementById('btn-quiz-res-retake'),
+    btnQuizResToCatalog: document.getElementById('btn-quiz-res-to-catalog'),
+
     // Placeholder
     plBadge: document.getElementById('pl-badge'),
     plTitle: document.getElementById('pl-title'),
@@ -149,6 +228,12 @@
     if (els.viewEmpRecommendations) els.viewEmpRecommendations.style.display = 'none';
     if (els.viewEmpRoadmap) els.viewEmpRoadmap.style.display = 'none';
     if (els.viewEmpAssistant) els.viewEmpAssistant.style.display = 'none';
+    if (els.viewEmpCourses) els.viewEmpCourses.style.display = 'none';
+    if (els.viewCourseDetail) els.viewCourseDetail.style.display = 'none';
+    if (els.viewLessonDetail) els.viewLessonDetail.style.display = 'none';
+    if (els.viewQuizzesList) els.viewQuizzesList.style.display = 'none';
+    if (els.viewQuizDetail) els.viewQuizDetail.style.display = 'none';
+    if (els.viewQuizResult) els.viewQuizResult.style.display = 'none';
     els.viewAdminDashboard.style.display = 'none';
     els.viewPlaceholder.style.display = 'none';
   }
@@ -233,6 +318,57 @@
         loadAssistantView();
         break;
 
+      case 'learning':
+      case 'courses':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewEmpCourses.style.display = 'block';
+        loadCoursesView();
+        break;
+
+      case 'course-detail':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewCourseDetail.style.display = 'block';
+        if (data && data.courseId) {
+          loadCourseDetailView(data.courseId);
+        }
+        break;
+
+      case 'lesson-detail':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewLessonDetail.style.display = 'block';
+        if (data && data.lessonId) {
+          loadLessonDetailView(data.lessonId);
+        }
+        break;
+
+      case 'quizzes':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewQuizzesList.style.display = 'block';
+        loadQuizzesListView();
+        break;
+
+      case 'quiz-detail':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewQuizDetail.style.display = 'block';
+        if (data && data.quizId) {
+          loadQuizDetailView(data.quizId);
+        }
+        break;
+
+      case 'quiz-result':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewQuizResult.style.display = 'block';
+        if (data && data.result) {
+          loadQuizResultView(data.result);
+        }
+        break;
+
       case 'admin-dashboard':
         els.headerAuthControls.style.display = 'flex';
         els.appNavBar.style.display = 'block';
@@ -288,12 +424,12 @@
         { id: 'skill-gaps', label: 'Skill Gaps', future: false },
         { id: 'recommendations', label: 'Recommendations', future: false },
         { id: 'roadmap', label: 'Roadmap', future: false },
+        { id: 'learning', label: 'Learning', future: false },
+        { id: 'quizzes', label: 'Quizzes', future: false },
         { id: 'assistant', label: 'Study Assistant', future: false },
         { id: 'assessment', label: 'Assessment', future: false },
         { id: 'result', label: 'Results', future: false },
         { id: 'profile', label: 'Profile', future: false },
-        { id: 'learning', label: 'Learning', future: true, stage: 'Stage 3', owner: 'Pathika', desc: 'Interactive lessons, micro-modules, and self-paced statistical coursework.' },
-        { id: 'quizzes', label: 'Quizzes', future: true, stage: 'Stage 3', owner: 'Pathika', desc: 'Competency post-tests and lesson verification knowledge checks.' },
         { id: 'achievements', label: 'Achievements', future: true, stage: 'Stage 4', owner: 'Pallav', desc: 'Official badges, skill milestones, and recognition trophies.' },
         { id: 'leaderboard', label: 'Leaderboard', future: true, stage: 'Stage 4', owner: 'Pallav', desc: 'Growth-based leaderboard tracking individual improvement from baseline.' }
       ];
@@ -333,6 +469,17 @@
     els.headerUserName.textContent = user.full_name || user.username;
     els.headerUserRole.textContent = user.role.toUpperCase();
     els.headerUserRole.className = `user-role-badge role-${user.role}`;
+  }
+
+  /**
+   * Helper: Return domain CSS class
+   */
+  function getDomainClass(domain) {
+    if (domain === 'Statistical') return 'domain-statistical';
+    if (domain === 'Technical') return 'domain-technical';
+    if (domain === 'Digital Governance') return 'domain-digital-governance';
+    if (domain === 'Behavioural / Managerial') return 'domain-behavioural-managerial';
+    return 'domain-statistical';
   }
 
   /**
@@ -384,17 +531,6 @@
       console.error('Dashboard load error:', err);
       window.showToast('Could not load profile data: ' + err.message, 'error');
     }
-  }
-
-  /**
-   * Helper: Return domain CSS class
-   */
-  function getDomainClass(domain) {
-    if (domain === 'Statistical') return 'domain-statistical';
-    if (domain === 'Technical') return 'domain-technical';
-    if (domain === 'Digital Governance') return 'domain-digital-governance';
-    if (domain === 'Behavioural / Managerial') return 'domain-behavioural-managerial';
-    return 'domain-statistical';
   }
 
   /**
@@ -464,7 +600,6 @@
    */
   async function loadEmployeeProfile() {
     try {
-      // Load departments if not loaded
       if (state.departments.length === 0) {
         const deptRes = await API.getDepartments();
         state.departments = deptRes.departments || [];
@@ -564,7 +699,6 @@
       els.questionsListContainer.appendChild(qBox);
     });
 
-    // Attach click listeners for radio change
     const radios = els.questionsListContainer.querySelectorAll('.option-radio');
     radios.forEach(radio => {
       radio.addEventListener('change', (e) => {
@@ -572,7 +706,6 @@
         const optVal = Number(e.target.value);
         state.assessmentAnswers[qid] = optVal;
 
-        // Update selected class on labels
         const labels = document.querySelectorAll(`[id^="opt-label-${qid}-"]`);
         labels.forEach(l => l.classList.remove('selected'));
         const activeLabel = document.getElementById(`opt-label-${qid}-${optVal}`);
@@ -597,6 +730,107 @@
   /**
    * Load Assessment Result View
    */
+  async function loadAssessmentResultView() {
+    try {
+      const res = await API.getAssessmentResult();
+      if (!res.has_result) {
+        window.showToast('No assessment results found. Please complete the assessment first.', 'info');
+        switchView('assessment');
+        return;
+      }
+
+      els.resultBadgeType.textContent = res.is_baseline ? 'OFFICIAL BASELINE ESTABLISHED' : `ASSESSMENT ATTEMPT #${res.attempt_number}`;
+      els.resStatAttempt.textContent = `Attempt #${res.attempt_number}`;
+      els.resStatAttemptDesc.textContent = res.is_baseline ? 'Permanent Baseline' : 'Score Update';
+      els.resStatOverall.textContent = `${res.overall_score}%`;
+
+      const correctCount = (res.question_review || []).filter(q => q.is_correct).length;
+      els.resStatCorrectCount.textContent = `${correctCount} of ${(res.question_review || []).length} correct`;
+
+      renderResultCompetencies(res.competencies);
+      renderResultReview(res.question_review);
+
+    } catch (err) {
+      console.error('Result load error:', err);
+      window.showToast('Could not load assessment result: ' + err.message, 'error');
+    }
+  }
+
+  function renderResultCompetencies(competencies) {
+    let html = '';
+    (competencies || []).forEach(c => {
+      const domainClass = getDomainClass(c.domain);
+      const isMet = (c.current_score >= c.target_score);
+
+      html += `
+        <div class="competency-card" style="border-left: 4px solid ${isMet ? 'var(--color-forest)' : 'var(--color-ochre)'};">
+          <div class="competency-header">
+            <span class="domain-badge ${domainClass}">${c.domain}</span>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-ink-muted);">${c.code}</span>
+          </div>
+          <div class="competency-title">${c.name}</div>
+          <div style="margin-top: var(--space-xs);">
+            <div class="competency-scores-row">
+              <div class="score-item">
+                <span class="score-item-label">Baseline</span>
+                <span class="score-item-val">${c.baseline_score}%</span>
+              </div>
+              <div class="score-item">
+                <span class="score-item-label">Current</span>
+                <span class="score-item-val" style="color: var(--color-forest-dark);">${c.current_score}%</span>
+              </div>
+              <div class="score-item">
+                <span class="score-item-label">Target</span>
+                <span class="score-item-val" style="color: var(--color-ochre);">${c.target_score}%</span>
+              </div>
+            </div>
+            <div class="progress-bar-container" style="margin-top: 4px;">
+              <div class="progress-bar-fill" style="width: ${Math.min(c.current_score, 100)}%;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    els.resultCompetenciesGrid.innerHTML = html;
+  }
+
+  function renderResultReview(reviewList) {
+    if (!reviewList || reviewList.length === 0) {
+      els.resultReviewContainer.innerHTML = '<p class="text-muted">No review data available.</p>';
+      return;
+    }
+
+    let html = '';
+    reviewList.forEach((r, idx) => {
+      html += `
+        <div class="question-box" style="border-left: 4px solid ${r.is_correct ? 'var(--color-forest)' : 'var(--color-danger)'};">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span class="question-number">QUESTION ${idx + 1}</span>
+            <span class="badge-pixel ${r.is_correct ? 'text-forest' : 'text-danger'}">
+              ${r.is_correct ? '✓ CORRECT' : '✕ INCORRECT'}
+            </span>
+          </div>
+          <div class="question-text" style="font-size: 0.95rem;">${r.question_text}</div>
+          
+          <div style="margin-top: var(--space-xs); font-size: 0.86rem;">
+            <div style="margin-bottom: 2px;">
+              <strong>Your Answer:</strong> <span style="color: ${r.is_correct ? 'var(--color-forest)' : 'var(--color-danger)'};">${r.submitted_option_text}</span>
+            </div>
+            ${!r.is_correct ? `
+              <div style="margin-bottom: 2px;">
+                <strong>Correct Answer:</strong> <span style="color: var(--color-forest); font-weight: 700;">${r.correct_option_text}</span>
+              </div>
+            ` : ''}
+            <div style="margin-top: 6px; padding: var(--space-xs); background: var(--color-paper-light); border: var(--border-subtle); font-size: 0.82rem;">
+              <strong>Explanation:</strong> ${r.explanation || 'No explanation provided.'}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    els.resultReviewContainer.innerHTML = html;
+  }
+
   /**
    * ==========================================================================
    * STAGE 2: INTELLIGENCE UI LOADERS & RENDERERS
@@ -606,9 +840,6 @@
   let currentGapsData = null;
   let currentActiveDomainFilter = 'ALL';
 
-  /**
-   * Load Skill Gaps View
-   */
   async function loadSkillGapsView() {
     try {
       if (!els.gapsListContainer) return;
@@ -649,9 +880,6 @@
     }
   }
 
-  /**
-   * Render Skill Gaps Cards / Table
-   */
   function renderSkillGapsList(competencies, filterDomain) {
     if (!competencies || competencies.length === 0) {
       els.gapsListContainer.innerHTML = '<div class="empty-state-card"><p>No competency data available.</p></div>';
@@ -740,9 +968,6 @@
     els.gapsListContainer.innerHTML = html;
   }
 
-  /**
-   * Load Recommendations View
-   */
   async function loadRecommendationsView() {
     try {
       if (!els.recommendationsContainer) return;
@@ -784,9 +1009,6 @@
     }
   }
 
-  /**
-   * Render Recommendations Grid
-   */
   function renderRecommendationsGrid(recommendations) {
     let html = '<div class="recommendations-grid">';
 
@@ -817,7 +1039,7 @@
 
             <h3 style="font-size: 1.05rem; margin-bottom: 4px; color: var(--color-ink);">${course.title}</h3>
             <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink-muted); margin-bottom: var(--space-xs);">
-              ${course.courseCode} • ${course.durationHours} Hours • ${course.difficultyLevel.toUpperCase()}
+              ${course.courseCode} • ${course.durationHours} Hours • ${(course.difficultyLevel || 'INTERMEDIATE').toUpperCase()}
             </div>
 
             <p style="font-size: 0.85rem; color: var(--color-ink-light); margin-bottom: var(--space-sm); line-height: 1.45;">
@@ -836,13 +1058,18 @@
             </div>
           </div>
 
-          <div style="margin-top: var(--space-md); padding-top: var(--space-sm); border-top: var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+          <div style="margin-top: var(--space-md); padding-top: var(--space-sm); border-top: var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-xs);">
             <span style="font-size: 0.78rem; color: var(--color-ink-muted); font-family: var(--font-mono);">
               Relevance: ${course.rankingScore}
             </span>
-            <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.switchView('roadmap')">
-              View in Roadmap →
-            </button>
+            <div style="display: flex; gap: var(--space-xs);">
+              <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.switchView('roadmap')">
+                In Roadmap
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.openCourse(${course.courseId})">
+                Start Course →
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -852,9 +1079,6 @@
     els.recommendationsContainer.innerHTML = html;
   }
 
-  /**
-   * Load Roadmap View
-   */
   async function loadRoadmapView() {
     try {
       if (!els.roadmapPhasesContainer) return;
@@ -894,9 +1118,6 @@
     }
   }
 
-  /**
-   * Render Roadmap Phases & Milestones
-   */
   function renderRoadmapPhases(stages) {
     if (!stages || stages.length === 0) {
       els.roadmapPhasesContainer.innerHTML = `
@@ -924,14 +1145,15 @@
         let coursesHtml = '';
         if (item.recommendedCourses && item.recommendedCourses.length > 0) {
           item.recommendedCourses.forEach(crs => {
+            const courseTargetId = crs.course_id || crs.courseId || crs.id;
             coursesHtml += `
               <div class="milestone-course-chip">
                 <div>
                   <strong>${crs.title}</strong>
                   <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-ink-muted); margin-left: 6px;">(${crs.sourceDisplayName || crs.source} • ${crs.durationHours} hrs)</span>
                 </div>
-                <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.switchView('recommendations')">
-                  Explore Course
+                <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.openCourse(${courseTargetId})">
+                  Start Learning →
                 </button>
               </div>
             `;
@@ -992,9 +1214,6 @@
     els.roadmapPhasesContainer.innerHTML = html;
   }
 
-  /**
-   * Load Study Assistant View
-   */
   async function loadAssistantView() {
     try {
       if (state.currentUser) {
@@ -1002,7 +1221,6 @@
         if (els.astOfficerDept) els.astOfficerDept.textContent = state.currentUser.department_name || 'MoSPI Division';
       }
 
-      // Initial welcome message if thread is empty
       if (els.chatThreadContainer && els.chatThreadContainer.children.length === 0) {
         const initialMsg = `Hello ${state.currentUser ? state.currentUser.full_name : 'Officer'}. I am your NAVBODH Explainable Study Assistant.\n\nI can analyze your official statistical competency scores, break down your skill gaps, and guide your learning sequence.\n\nTry clicking any of the quick inquiries above or type a question below!`;
         appendAssistantMessage(initialMsg, 'NAVBODH Rule-Based Intelligence Engine (Demo)');
@@ -1012,9 +1230,6 @@
     }
   }
 
-  /**
-   * Append User Message to Chat Thread
-   */
   function appendUserMessage(text) {
     if (!els.chatThreadContainer) return;
     const row = document.createElement('div');
@@ -1026,9 +1241,6 @@
     els.chatThreadContainer.scrollTop = els.chatThreadContainer.scrollHeight;
   }
 
-  /**
-   * Append Assistant Message to Chat Thread
-   */
   function appendAssistantMessage(text, engineLabel) {
     if (!els.chatThreadContainer) return;
     const row = document.createElement('div');
@@ -1046,37 +1258,25 @@
     els.chatThreadContainer.scrollTop = els.chatThreadContainer.scrollHeight;
   }
 
-  /**
-   * Helper: Escape HTML
-   */
   function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
 
-  /**
-   * Helper: Lightweight Markdown format for assistant output
-   */
   function formatAssistantMarkdown(text) {
     let safe = escapeHtml(text);
-    // Bold
     safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Bullet points
     safe = safe.replace(/• (.*?)(?=\n|$)/g, '• $1');
     return safe;
   }
 
-  /**
-   * Send Query to Study Assistant Endpoint
-   */
   async function sendAssistantQuery(query) {
     if (!query || !query.trim()) return;
 
     appendUserMessage(query.trim());
     els.inputAssistantQuery.value = '';
 
-    // Temporary loading indicator
     const loadingRow = document.createElement('div');
     loadingRow.className = 'chat-message-row assistant-msg';
     loadingRow.id = 'ast-loading-indicator';
@@ -1097,6 +1297,594 @@
       loadingRow.remove();
       appendAssistantMessage(`An error occurred while processing your study assistant request: ${err.message}`, 'System Error Handler');
     }
+  }
+
+  /**
+   * ==========================================================================
+   * STAGE 3: LEARNING UI LOADERS & RENDERERS (Owner: Pathika)
+   * ==========================================================================
+   */
+
+  /**
+   * Load Courses Catalogue View
+   */
+  async function loadCoursesView() {
+    try {
+      if (!els.coursesListContainer) return;
+      els.coursesListContainer.innerHTML = '<div style="text-align:center; padding: var(--space-xl); color: var(--color-ink-muted);">Loading official course catalogue...</div>';
+
+      const res = await API.learning.getCourses();
+      state.allCourses = res.courses || [];
+
+      // Calculate aggregated metrics
+      let inProgressCount = 0;
+      let completedCoursesCount = 0;
+      let totalLessonsCompleted = 0;
+
+      state.allCourses.forEach(c => {
+        if (c.progress) {
+          totalLessonsCompleted += (c.progress.completed_lessons || 0);
+          if (c.progress.status === 'completed' || c.progress.progress_percent >= 100) {
+            completedCoursesCount++;
+          } else if (c.progress.status === 'in_progress' || (c.progress.completed_lessons || 0) > 0) {
+            inProgressCount++;
+          }
+        }
+      });
+
+      if (els.crsStatTotal) els.crsStatTotal.textContent = state.allCourses.length;
+      if (els.crsStatInProgress) els.crsStatInProgress.textContent = inProgressCount;
+      if (els.crsStatCompleted) els.crsStatCompleted.textContent = completedCoursesCount;
+      if (els.crsStatLessonsCompleted) els.crsStatLessonsCompleted.textContent = totalLessonsCompleted;
+
+      renderCoursesGrid(state.allCourses, state.activeCourseDomainFilter);
+
+    } catch (err) {
+      console.error('Courses load error:', err);
+      window.showToast('Could not load courses: ' + err.message, 'error');
+    }
+  }
+
+  /**
+   * Render Courses Grid
+   */
+  function renderCoursesGrid(courses, filterDomain) {
+    if (!courses || courses.length === 0) {
+      els.coursesListContainer.innerHTML = '<div class="empty-state-card"><p>No courses available at this time.</p></div>';
+      return;
+    }
+
+    const filtered = filterDomain === 'ALL'
+      ? courses
+      : courses.filter(c => c.domain === filterDomain);
+
+    if (filtered.length === 0) {
+      els.coursesListContainer.innerHTML = `
+        <div class="empty-state-card">
+          <p>No courses found for domain: <strong>${filterDomain}</strong></p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '<div class="recommendations-grid">';
+    filtered.forEach(course => {
+      const domainClass = getDomainClass(course.domain);
+      const progress = course.progress || { progress_percent: 0, status: 'enrolled', completed_lessons: 0, total_lessons: course.total_lessons || 0 };
+      const isComplete = (progress.status === 'completed' || progress.progress_percent >= 100);
+
+      let statusBadge = '<span class="badge-pixel text-muted">ENROLLED</span>';
+      if (isComplete) {
+        statusBadge = '<span class="badge-pixel text-forest" style="background: var(--color-forest-light); border: 1px solid var(--color-forest);">✓ COMPLETED</span>';
+      } else if (progress.status === 'in_progress' || progress.completed_lessons > 0) {
+        statusBadge = '<span class="badge-pixel text-ochre" style="background: var(--color-ochre-light); border: 1px solid var(--color-ochre);">IN PROGRESS</span>';
+      }
+
+      let compPills = '';
+      (course.competencies || []).forEach(comp => {
+        compPills += `
+          <span class="matched-comp-pill" style="font-size: 0.72rem;">
+            ${comp.name} (+${comp.growth_impact_score} pts)
+          </span>
+        `;
+      });
+
+      html += `
+        <div class="recommendation-card">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-xs); margin-bottom: 6px;">
+              <span class="domain-badge ${domainClass}">${course.domain}</span>
+              ${statusBadge}
+            </div>
+
+            <h3 style="font-size: 1.05rem; margin-bottom: 4px; color: var(--color-ink);">${course.title}</h3>
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink-muted); margin-bottom: var(--space-xs);">
+              ${course.code} • ${course.duration_hours} Hours • ${(course.difficulty_level || 'INTERMEDIATE').toUpperCase()} • ${course.total_lessons} Lessons
+            </div>
+
+            <div class="badge-source" style="margin-bottom: var(--space-xs); display: inline-block;">
+              ${course.source_display_name || course.source_label}
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--color-ink-light); margin-bottom: var(--space-sm); line-height: 1.45;">
+              ${course.description || ''}
+            </p>
+
+            <div style="margin-bottom: var(--space-sm);">
+              <div style="font-size: 0.76rem; font-weight: 700; color: var(--color-ink-muted); margin-bottom: 4px;">TARGETED COMPETENCIES:</div>
+              <div style="display: flex; flex-wrap: wrap;">
+                ${compPills}
+              </div>
+            </div>
+
+            <div style="margin-bottom: var(--space-xs);">
+              <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 700; color: var(--color-ink-muted); margin-bottom: 2px;">
+                <span>PROGRESS</span>
+                <span>${progress.completed_lessons} / ${progress.total_lessons} Lessons (${progress.progress_percent}%)</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: ${progress.progress_percent}%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: var(--space-md); padding-top: var(--space-sm); border-top: var(--border-subtle); display: flex; justify-content: flex-end;">
+            <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.openCourse(${course.id})">
+              ${isComplete ? 'Review Course →' : (progress.completed_lessons > 0 ? 'Continue Course →' : 'Start Course →')}
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    html += '</div>';
+    els.coursesListContainer.innerHTML = html;
+  }
+
+  /**
+   * Load Course Detail View
+   */
+  async function loadCourseDetailView(courseId) {
+    try {
+      if (!els.viewCourseDetail) return;
+
+      const res = await API.learning.getCourse(courseId);
+      const course = res.course;
+      const competencies = res.competencies || [];
+      const lessons = res.lessons || [];
+      const quizzes = res.quizzes || [];
+      const progress = res.progress || { progress_percent: 0, status: 'enrolled', completed_lessons: 0, total_lessons: lessons.length };
+
+      state.currentCourse = res;
+
+      // Populate header & meta
+      els.courseDetailTitle.textContent = course.title;
+      els.courseDetailDomainBadge.textContent = course.domain.toUpperCase();
+      els.courseDetailDomainBadge.className = `domain-badge ${getDomainClass(course.domain)}`;
+      els.courseDetailSourceBadge.innerHTML = `<span class="badge-source">${course.source_display_name || course.source_label}</span>`;
+      els.courseDetailMeta.textContent = `${course.code} • ${course.duration_hours} HOURS • ${(course.difficulty_level || 'INTERMEDIATE').toUpperCase()}`;
+      els.courseDetailDescription.textContent = course.description || '';
+
+      // Competencies
+      let compHtml = '';
+      competencies.forEach(c => {
+        compHtml += `
+          <span class="matched-comp-pill">
+            <strong>${c.name}</strong> (${c.code}) • Score: ${c.current_score}% / Target: ${c.target_score}% (+${c.growth_impact_score} pts)
+          </span>
+        `;
+      });
+      els.courseDetailCompetenciesList.innerHTML = compHtml || '<span class="text-muted">No mapped competencies.</span>';
+
+      // Progress bar
+      els.courseDetailProgressLabel.textContent = `${progress.progress_percent}% (${progress.completed_lessons} / ${progress.total_lessons} Lessons Completed)`;
+      els.courseDetailProgressBar.style.width = `${progress.progress_percent}%`;
+
+      // Lessons list
+      els.courseDetailLessonsCount.textContent = `${lessons.length} LESSONS`;
+      let lessonsHtml = '';
+      lessons.forEach((l, idx) => {
+        const isCompleted = Boolean(l.is_completed);
+        lessonsHtml += `
+          <div class="curriculum-lesson-item ${isCompleted ? 'completed' : ''}">
+            <div style="display: flex; align-items: center; gap: var(--space-sm);">
+              <div class="lesson-seq-badge">${l.sequence_order || (idx + 1)}</div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-ink);">
+                  ${l.title}
+                </div>
+                <div style="font-size: 0.8rem; color: var(--color-ink-muted); margin-top: 2px;">
+                  ${l.duration_minutes} Mins • ${l.content_summary || ''}
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: var(--space-sm); flex-shrink: 0;">
+              ${isCompleted ? `
+                <span class="badge-pixel text-forest" style="background: var(--color-forest-light); padding: 3px 8px; border: 1px solid var(--color-forest);">
+                  ✓ COMPLETED
+                </span>
+              ` : `
+                <span class="badge-pixel text-muted" style="padding: 3px 8px;">
+                  PENDING
+                </span>
+              `}
+              <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.openLesson(${l.id})">
+                ${isCompleted ? 'Review Lesson' : 'Open Lesson →'}
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      els.courseDetailLessonsList.innerHTML = lessonsHtml || '<p class="text-muted">No lessons available for this course.</p>';
+
+      // Quiz card
+      let quizHtml = '';
+      if (quizzes.length > 0) {
+        quizzes.forEach(q => {
+          const hasPassed = Boolean(q.user_passed);
+          const hasAttempt = (q.attempts_count || 0) > 0;
+
+          quizHtml += `
+            <div class="quiz-card-box">
+              <div>
+                <div style="display: flex; align-items: center; gap: var(--space-xs); margin-bottom: 4px;">
+                  <h3 style="font-size: 1.05rem; margin-bottom: 0;">${q.title}</h3>
+                  ${hasPassed ? '<span class="quiz-badge-passed">✓ PASSED</span>' : (hasAttempt ? '<span class="quiz-badge-pending">ATTEMPTED</span>' : '<span class="badge-pixel text-muted">NOT ATTEMPTED</span>')}
+                </div>
+                <div style="font-size: 0.82rem; color: var(--color-ink-muted);">
+                  Pass Benchmark: ${q.pass_percentage}% • ${q.total_questions} Questions ${hasAttempt ? `• Best Score: ${q.user_best_score}% (${q.attempts_count} Attempts)` : ''}
+                </div>
+                <p style="font-size: 0.85rem; color: var(--color-ink-light); margin-top: var(--space-xs); margin-bottom: 0;">
+                  ${q.description || 'Test your understanding of the concepts covered in this course.'}
+                </p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.openQuiz(${q.id})">
+                ${hasPassed ? 'Retake Quiz →' : 'Take Knowledge Quiz →'}
+              </button>
+            </div>
+          `;
+        });
+      } else {
+        quizHtml = '<p class="text-muted">No quiz currently associated with this course.</p>';
+      }
+      els.courseDetailQuizContainer.innerHTML = quizHtml;
+
+    } catch (err) {
+      console.error('Course detail load error:', err);
+      window.showToast('Could not load course details: ' + err.message, 'error');
+    }
+  }
+
+  /**
+   * Load Lesson Detail View (Interactive Reader)
+   */
+  async function loadLessonDetailView(lessonId) {
+    try {
+      if (!els.viewLessonDetail) return;
+
+      const res = await API.learning.getLesson(lessonId);
+      const lesson = res.lesson;
+      const course = res.course;
+      const materials = res.materials || [];
+      const nav = res.navigation || {};
+
+      state.currentLesson = res;
+
+      // Header info
+      els.lessonHeaderBreadcrumb.textContent = `${course.title} / Lesson ${nav.current_index || lesson.sequence_order} of ${nav.total_lessons || 1}`;
+      els.lessonDetailTitle.textContent = lesson.title;
+      els.lessonDetailMeta.textContent = `Lesson ${lesson.sequence_order} • ${lesson.duration_minutes} Minutes Duration • ${course.code}`;
+
+      if (lesson.is_completed) {
+        els.lessonDetailStatusBadge.innerHTML = `<span class="badge-pixel text-forest" style="background: var(--color-forest-light); padding: 4px 10px; border: 1px solid var(--color-forest);">✓ COMPLETED</span>`;
+        els.lessonCompletionStatusText.textContent = '✓ Lesson Completed';
+        els.lessonCompletionStatusText.style.color = 'var(--color-forest)';
+        els.lessonCompletionStatusDesc.textContent = `Completed on ${new Date(lesson.completed_at || Date.now()).toLocaleDateString()}. Your progress is permanently saved.`;
+        els.btnMarkLessonComplete.textContent = '✓ LESSON ALREADY COMPLETED';
+        els.btnMarkLessonComplete.className = 'btn btn-secondary btn-lg';
+      } else {
+        els.lessonDetailStatusBadge.innerHTML = `<span class="badge-pixel text-ochre" style="background: var(--color-ochre-light); padding: 4px 10px; border: 1px solid var(--color-ochre);">IN PROGRESS</span>`;
+        els.lessonCompletionStatusText.textContent = 'Lesson Progress: Pending Completion';
+        els.lessonCompletionStatusText.style.color = 'var(--color-ink)';
+        els.lessonCompletionStatusDesc.textContent = 'Click to record completion in your official training record.';
+        els.btnMarkLessonComplete.textContent = '✓ MARK LESSON AS COMPLETED';
+        els.btnMarkLessonComplete.className = 'btn btn-primary btn-lg';
+      }
+
+      // Detailed Lesson Body
+      renderLessonContent(lesson, course);
+
+      // Attached Materials
+      if (materials.length > 0) {
+        let matHtml = '';
+        materials.forEach(m => {
+          let icon = '📄';
+          if (m.material_type === 'dataset') icon = '📊';
+          else if (m.material_type === 'reference_manual') icon = '📚';
+          else if (m.material_type === 'guideline') icon = '🛡️';
+
+          matHtml += `
+            <div class="material-chip">
+              <span class="material-chip-icon">${icon}</span>
+              <div>
+                <strong>${m.title}</strong>
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-ink-muted);">
+                  ${(m.material_type || 'DOCUMENT').toUpperCase()} • Ref: ${m.file_url_or_ref || 'Internal Library'}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        els.lessonMaterialsList.innerHTML = matHtml;
+        document.getElementById('lesson-materials-section').style.display = 'block';
+      } else {
+        document.getElementById('lesson-materials-section').style.display = 'none';
+      }
+
+      // Prev / Next Navigation buttons
+      if (nav.prev_lesson_id) {
+        els.btnLessonPrev.style.display = 'inline-flex';
+        els.btnLessonPrev.onclick = () => loadLessonDetailView(nav.prev_lesson_id);
+      } else {
+        els.btnLessonPrev.style.display = 'none';
+      }
+
+      if (nav.next_lesson_id) {
+        els.btnLessonNext.style.display = 'inline-flex';
+        els.btnLessonNext.textContent = 'Next Lesson →';
+        els.btnLessonNext.onclick = () => loadLessonDetailView(nav.next_lesson_id);
+      } else {
+        els.btnLessonNext.style.display = 'inline-flex';
+        els.btnLessonNext.textContent = 'Return to Course Summary →';
+        els.btnLessonNext.onclick = () => loadCourseDetailView(lesson.course_id);
+      }
+
+    } catch (err) {
+      console.error('Lesson detail load error:', err);
+      window.showToast('Could not load lesson: ' + err.message, 'error');
+    }
+  }
+
+  /**
+   * Render structured lesson content
+   */
+  function renderLessonContent(lesson, course) {
+    let contentHtml = `
+      <div class="lesson-section-title">1. Operational Overview & Learning Objectives</div>
+      <p style="margin-bottom: var(--space-sm);">
+        ${lesson.content_summary}
+      </p>
+      <p>
+        In accordance with official statistical standards maintained by the Ministry of Statistics and Programme Implementation (MoSPI) and training frameworks established under NSSTA, this module emphasizes rigorous applied methodologies, systematic field validation, and reproducible statistical computation.
+      </p>
+
+      <div class="lesson-key-takeaways">
+        <strong>📌 Key Methodological Takeaways:</strong>
+        <ul>
+          <li>Structured adherence to national standard taxonomies and quality frameworks.</li>
+          <li>Systematic error detection protocols and outlier mitigation mechanisms.</li>
+          <li>Data confidentiality safeguards compliant with the Digital Personal Data Protection Act.</li>
+        </ul>
+      </div>
+
+      <div class="lesson-section-title">2. Methodological Standards & Practical Protocols</div>
+      <p style="margin-bottom: var(--space-sm);">
+        When implementing the techniques outlined in <em>${lesson.title}</em>, statistical officers should ensure that all sampling frames, intermediate aggregation matrices, and microdata registries maintain full audit traceability.
+      </p>
+      <p>
+        Refer to the attached reference manuals and sample datasets below for comprehensive formulas, data dictionary definitions, and practical scripts.
+      </p>
+    `;
+
+    els.lessonContentBody.innerHTML = contentHtml;
+  }
+
+  /**
+   * Load Quizzes List View
+   */
+  async function loadQuizzesListView() {
+    try {
+      if (!els.quizzesGridContainer) return;
+      els.quizzesGridContainer.innerHTML = '<div style="text-align:center; padding: var(--space-xl); color: var(--color-ink-muted);">Loading knowledge quizzes...</div>';
+
+      const res = await API.learning.getQuizzes();
+      const quizzes = res.quizzes || [];
+
+      if (quizzes.length === 0) {
+        els.quizzesGridContainer.innerHTML = '<div class="empty-state-card"><p>No quizzes currently available.</p></div>';
+        return;
+      }
+
+      let html = '';
+      quizzes.forEach(q => {
+        const hasPassed = Boolean(q.has_passed);
+        const hasAttempt = (q.total_attempts || 0) > 0;
+
+        html += `
+          <div class="recommendation-card">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-xs); margin-bottom: 6px;">
+                <span class="domain-badge ${getDomainClass(q.course_domain || 'Statistical')}">${q.course_domain || 'Statistical'}</span>
+                ${hasPassed ? '<span class="quiz-badge-passed">✓ PASSED</span>' : (hasAttempt ? '<span class="quiz-badge-pending">ATTEMPTED</span>' : '<span class="badge-pixel text-muted">PENDING</span>')}
+              </div>
+
+              <h3 style="font-size: 1.05rem; margin-bottom: 4px; color: var(--color-ink);">${q.title}</h3>
+              <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink-muted); margin-bottom: var(--space-xs);">
+                Course: ${q.course_title || q.course_code || 'Official Course'} • ${q.total_questions} Questions • Pass: ${q.pass_percentage}%
+              </div>
+
+              <p style="font-size: 0.85rem; color: var(--color-ink-light); margin-bottom: var(--space-sm); line-height: 1.45;">
+                ${q.description || 'Knowledge check verification for statistical officers.'}
+              </p>
+
+              ${hasAttempt ? `
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-ink); background: var(--color-paper-light); padding: 4px 8px; border: var(--border-subtle); margin-bottom: var(--space-xs);">
+                  Best Score: <strong>${q.best_score}%</strong> • Total Attempts: ${q.total_attempts}
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="margin-top: var(--space-md); padding-top: var(--space-sm); border-top: var(--border-subtle); display: flex; justify-content: flex-end;">
+              <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.openQuiz(${q.id})">
+                ${hasPassed ? 'Retake Quiz →' : 'Take Quiz →'}
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      els.quizzesGridContainer.innerHTML = html;
+
+    } catch (err) {
+      console.error('Quizzes list error:', err);
+      window.showToast('Could not load quizzes: ' + err.message, 'error');
+    }
+  }
+
+  /**
+   * Load Quiz Detail View (Take Quiz)
+   */
+  async function loadQuizDetailView(quizId) {
+    try {
+      if (!els.viewQuizDetail) return;
+
+      const res = await API.learning.getQuiz(quizId);
+      const quiz = res.quiz;
+      const questions = res.questions || [];
+
+      state.currentQuiz = quiz;
+      state.quizAnswers = {};
+
+      els.quizDetailTitle.textContent = quiz.title;
+      els.quizPassMarkBadge.textContent = `PASS MARK: ${quiz.pass_percentage}%`;
+      els.quizDetailDescription.textContent = quiz.description || 'Answer all questions. Results and question explanations are evaluated and generated server-side.';
+
+      renderQuizQuestions(questions);
+      updateQuizProgress(questions.length);
+
+    } catch (err) {
+      console.error('Quiz detail load error:', err);
+      window.showToast('Could not load quiz: ' + err.message, 'error');
+    }
+  }
+
+  /**
+   * Render Quiz Questions Form
+   */
+  function renderQuizQuestions(questions) {
+    els.quizQuestionsContainer.innerHTML = '';
+
+    questions.forEach((q, idx) => {
+      const qBox = document.createElement('div');
+      qBox.className = 'question-box';
+      qBox.id = `qz-box-${q.id}`;
+
+      let optionsHtml = '';
+      (q.options || []).forEach((optText, optIdx) => {
+        optionsHtml += `
+          <label class="option-item" id="qz-opt-label-${q.id}-${optIdx}">
+            <input type="radio" name="qz_${q.id}" value="${optIdx}" class="qz-option-radio" data-qid="${q.id}">
+            <span>${optText}</span>
+          </label>
+        `;
+      });
+
+      qBox.innerHTML = `
+        <div class="question-meta">
+          <span class="question-number">QUESTION ${idx + 1} OF ${questions.length}</span>
+        </div>
+        <div class="question-text">${q.question_text}</div>
+        <div class="options-list">
+          ${optionsHtml}
+        </div>
+      `;
+
+      els.quizQuestionsContainer.appendChild(qBox);
+    });
+
+    const radios = els.quizQuestionsContainer.querySelectorAll('.qz-option-radio');
+    radios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const qid = e.target.dataset.qid;
+        const optVal = Number(e.target.value);
+        state.quizAnswers[qid] = optVal;
+
+        const labels = document.querySelectorAll(`[id^="qz-opt-label-${qid}-"]`);
+        labels.forEach(l => l.classList.remove('selected'));
+        const activeLabel = document.getElementById(`qz-opt-label-${qid}-${optVal}`);
+        if (activeLabel) activeLabel.classList.add('selected');
+
+        updateQuizProgress(questions.length);
+      });
+    });
+  }
+
+  function updateQuizProgress(totalQuestions) {
+    const answeredCount = Object.keys(state.quizAnswers).length;
+    const pct = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+
+    els.quizProgressText.textContent = `${answeredCount} / ${totalQuestions} Questions Answered (${pct}%)`;
+    els.quizProgressBar.style.width = `${pct}%`;
+  }
+
+  /**
+   * Load Quiz Result & Review View
+   */
+  function loadQuizResultView(result) {
+    if (!els.viewQuizResult || !result) return;
+
+    const isPassed = Boolean(result.passed);
+    els.quizResultTitle.textContent = `${result.quiz_title || 'Quiz'} — Result`;
+    
+    if (isPassed) {
+      els.quizResultPassBadge.textContent = '✓ PASSED';
+      els.quizResultPassBadge.className = 'badge-pixel text-forest';
+      els.quizResultPassBadge.style.background = 'var(--color-forest-light)';
+      els.quizResultPassBadge.style.border = '1px solid var(--color-forest)';
+    } else {
+      els.quizResultPassBadge.textContent = '✕ DID NOT PASS';
+      els.quizResultPassBadge.className = 'badge-pixel text-danger';
+      els.quizResultPassBadge.style.background = 'var(--color-danger-light)';
+      els.quizResultPassBadge.style.border = '1px solid var(--color-danger)';
+    }
+
+    els.quizResStatScore.textContent = `${result.score}%`;
+    els.quizResStatScore.style.color = isPassed ? 'var(--color-forest)' : 'var(--color-danger)';
+    els.quizResStatPassDesc.textContent = `Pass Mark: ${result.pass_percentage}%`;
+    els.quizResStatCorrect.textContent = `${result.total_correct} / ${result.total_questions}`;
+
+    // Render question-by-question review
+    let reviewHtml = '';
+    (result.question_review || []).forEach((r, idx) => {
+      reviewHtml += `
+        <div class="question-box" style="border-left: 4px solid ${r.is_correct ? 'var(--color-forest)' : 'var(--color-danger)'};">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span class="question-number">QUESTION ${idx + 1}</span>
+            <span class="badge-pixel ${r.is_correct ? 'text-forest' : 'text-danger'}">
+              ${r.is_correct ? '✓ CORRECT' : '✕ INCORRECT'}
+            </span>
+          </div>
+          <div class="question-text" style="font-size: 0.95rem;">${r.question_text}</div>
+          
+          <div style="margin-top: var(--space-xs); font-size: 0.86rem;">
+            <div style="margin-bottom: 2px;">
+              <strong>Your Selection:</strong> <span style="color: ${r.is_correct ? 'var(--color-forest)' : 'var(--color-danger)'};">${r.submitted_option_text}</span>
+            </div>
+            ${!r.is_correct ? `
+              <div style="margin-bottom: 2px;">
+                <strong>Correct Key:</strong> <span style="color: var(--color-forest); font-weight: 700;">${r.correct_option_text}</span>
+              </div>
+            ` : ''}
+            <div style="margin-top: 6px; padding: var(--space-xs); background: var(--color-paper-light); border: var(--border-subtle); font-size: 0.82rem;">
+              <strong>Explanation:</strong> ${r.explanation || 'No explanation provided.'}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    els.quizReviewContainer.innerHTML = reviewHtml || '<p class="text-muted">No review items available.</p>';
   }
 
   /**
@@ -1315,7 +2103,7 @@
 
     if (els.btnRoadmapToRecs) {
       els.btnRoadmapToRecs.addEventListener('click', () => {
-        switchView('recommendations');
+        switchView('learning');
       });
     }
 
@@ -1339,6 +2127,127 @@
         }
       });
     });
+
+    // Stage 3: Courses Domain Filters
+    if (els.coursesDomainFilters) {
+      els.coursesDomainFilters.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-filter');
+        if (!btn) return;
+        const dom = btn.dataset.domain;
+        state.activeCourseDomainFilter = dom;
+
+        els.coursesDomainFilters.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        renderCoursesGrid(state.allCourses, dom);
+      });
+    }
+
+    // Stage 3: Back to Courses Button
+    if (els.btnBackToCourses) {
+      els.btnBackToCourses.addEventListener('click', () => {
+        switchView('learning');
+      });
+    }
+
+    // Stage 3: Back to Course from Lesson
+    if (els.btnLessonBackToCourse) {
+      els.btnLessonBackToCourse.addEventListener('click', () => {
+        if (state.currentLesson && state.currentLesson.lesson) {
+          switchView('course-detail', { courseId: state.currentLesson.lesson.course_id });
+        } else {
+          switchView('learning');
+        }
+      });
+    }
+
+    // Stage 3: Mark Lesson Completed Button
+    if (els.btnMarkLessonComplete) {
+      els.btnMarkLessonComplete.addEventListener('click', async () => {
+        if (!state.currentLesson || !state.currentLesson.lesson) return;
+        const lessonId = state.currentLesson.lesson.id;
+
+        try {
+          const res = await API.learning.completeLesson(lessonId);
+          window.showToast('Lesson marked as completed! Course progress updated.', 'success');
+          // Reload lesson view to reflect persistent updated state
+          loadLessonDetailView(lessonId);
+        } catch (err) {
+          console.error('Lesson completion error:', err);
+          window.showToast('Could not record lesson completion: ' + err.message, 'error');
+        }
+      });
+    }
+
+    // Stage 3: Cancel Quiz Button
+    if (els.btnQuizCancel || els.btnCancelQuizForm) {
+      const cancelHandler = () => {
+        if (state.currentQuiz && state.currentQuiz.course_id) {
+          switchView('course-detail', { courseId: state.currentQuiz.course_id });
+        } else {
+          switchView('quizzes');
+        }
+      };
+      if (els.btnQuizCancel) els.btnQuizCancel.addEventListener('click', cancelHandler);
+      if (els.btnCancelQuizForm) els.btnCancelQuizForm.addEventListener('click', cancelHandler);
+    }
+
+    // Stage 3: Quiz Form Submit (Server-side scoring)
+    if (els.formQuiz) {
+      els.formQuiz.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!state.currentQuiz) return;
+
+        const totalQ = state.currentQuiz.total_questions || 3;
+        const answeredCount = Object.keys(state.quizAnswers).length;
+
+        if (answeredCount < totalQ) {
+          const confirmSubmit = confirm(`You have answered ${answeredCount} of ${totalQ} questions. Unanswered questions will receive 0 score. Do you want to submit?`);
+          if (!confirmSubmit) return;
+        }
+
+        try {
+          window.showToast('Evaluating quiz answers on server...', 'info');
+          const res = await API.learning.submitQuiz(state.currentQuiz.id, state.quizAnswers);
+
+          if (res.passed) {
+            window.showToast(`Congratulations! You passed with ${res.score}%!`, 'success');
+          } else {
+            window.showToast(`Quiz completed with ${res.score}%. Pass benchmark is ${res.pass_percentage}%.`, 'info');
+          }
+
+          switchView('quiz-result', { result: res });
+        } catch (err) {
+          console.error('Quiz submit error:', err);
+          window.showToast('Could not submit quiz: ' + err.message, 'error');
+        }
+      });
+    }
+
+    // Stage 3: Quiz Result Actions
+    if (els.btnQuizResToCourse) {
+      els.btnQuizResToCourse.addEventListener('click', () => {
+        if (state.currentQuiz && state.currentQuiz.course_id) {
+          switchView('course-detail', { courseId: state.currentQuiz.course_id });
+        } else {
+          switchView('learning');
+        }
+      });
+    }
+
+    if (els.btnQuizResRetake) {
+      els.btnQuizResRetake.addEventListener('click', () => {
+        if (state.currentQuiz && state.currentQuiz.id) {
+          switchView('quiz-detail', { quizId: state.currentQuiz.id });
+        }
+      });
+    }
+
+    if (els.btnQuizResToCatalog) {
+      els.btnQuizResToCatalog.addEventListener('click', () => {
+        switchView('learning');
+      });
+    }
   }
 
   /**
@@ -1361,7 +2270,6 @@
         switchView('login');
       }
     } catch (err) {
-      // Unauthenticated, show login view
       switchView('login');
     }
   }
@@ -1374,6 +2282,15 @@
     },
     goToAssessment() {
       switchView('assessment');
+    },
+    openCourse(courseId) {
+      switchView('course-detail', { courseId });
+    },
+    openLesson(lessonId) {
+      switchView('lesson-detail', { lessonId });
+    },
+    openQuiz(quizId) {
+      switchView('quiz-detail', { quizId });
     },
     switchView
   };

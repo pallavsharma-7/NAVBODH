@@ -35,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', coreRoutes);
+app.use('/api', learningRoutes);
 app.use('/api/intelligence', intelligenceRoutes);
 app.use('/api/learning', learningRoutes);
 app.use('/api/gamification', gamificationRoutes);

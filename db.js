@@ -190,7 +190,8 @@ function initDatabase() {
       sequence_order INTEGER NOT NULL DEFAULT 1,
       content_summary TEXT,
       duration_minutes INTEGER DEFAULT 15,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(course_id, sequence_order)
     );
 
     -- 11. Learning Materials Table
@@ -200,7 +201,8 @@ function initDatabase() {
       title TEXT NOT NULL,
       material_type TEXT CHECK(material_type IN ('document', 'video', 'dataset', 'reference_manual', 'guideline')),
       file_url_or_ref TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(lesson_id, title)
     );
 
     -- 12. Learning Progress Table
@@ -224,7 +226,21 @@ function initDatabase() {
       title TEXT NOT NULL,
       description TEXT,
       pass_percentage REAL DEFAULT 70.0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(course_id)
+    );
+
+    -- 13b. Quiz Questions Table (Stage 3 Learning Knowledge Checks)
+    CREATE TABLE IF NOT EXISTS quiz_questions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      quiz_id INTEGER NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
+      question_text TEXT NOT NULL,
+      options_json TEXT NOT NULL,
+      correct_option_index INTEGER NOT NULL,
+      explanation TEXT,
+      sequence_order INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(quiz_id, sequence_order)
     );
 
     -- 14. Quiz Attempts Table
@@ -234,7 +250,17 @@ function initDatabase() {
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       score REAL NOT NULL,
       passed INTEGER NOT NULL DEFAULT 0,
+      details_json TEXT,
       attempted_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- 14b. Lesson Completions Table (Stage 3 Persistent Lesson Completion Tracking)
+    CREATE TABLE IF NOT EXISTS lesson_completions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      lesson_id INTEGER NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+      completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, lesson_id)
     );
 
     -- 15. Reward Ledger Table (Future Gamification Foundation)
@@ -284,6 +310,12 @@ function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_emp_comp_user_id ON employee_competencies(user_id);
     CREATE INDEX IF NOT EXISTS idx_assessment_attempts_user_id ON assessment_attempts(user_id);
     CREATE INDEX IF NOT EXISTS idx_questions_assessment_id ON assessment_questions(assessment_id);
+    CREATE INDEX IF NOT EXISTS idx_lessons_course_id ON lessons(course_id);
+    CREATE INDEX IF NOT EXISTS idx_lesson_completions_user ON lesson_completions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_lesson_completions_user_lesson ON lesson_completions(user_id, lesson_id);
+    CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz_id ON quiz_questions(quiz_id);
+    CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_quiz ON quiz_attempts(user_id, quiz_id);
+    CREATE INDEX IF NOT EXISTS idx_learning_progress_user_course ON learning_progress(user_id, course_id);
   `);
 
   return database;

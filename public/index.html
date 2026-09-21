@@ -600,6 +600,329 @@
     </section>
 
     <!-- ====================================================================
+         VIEW: STAGE 3 - COURSE CATALOGUE & LEARNING MODULE
+         ==================================================================== -->
+    <section id="view-employee-courses" style="display: none;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>STATISTICAL LEARNING & COURSE CATALOGUE</h2>
+          </div>
+          <span class="badge-pixel text-forest">STAGE 3 LEARNING</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md);">
+          Explore official statistical courses, self-paced interactive lessons, and competency training modules curated from Sample iGOT-Karmayogi and NSSTA TPAC frameworks.
+        </p>
+
+        <!-- Course Summary Metrics -->
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Available Courses</div>
+            <div class="stat-tile-value text-forest" id="crs-stat-total">6</div>
+            <div class="stat-tile-desc">Across 4 official domains</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">In Progress</div>
+            <div class="stat-tile-value text-ochre" id="crs-stat-in-progress">0</div>
+            <div class="stat-tile-desc">Active course enrollments</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Completed Courses</div>
+            <div class="stat-tile-value text-success" id="crs-stat-completed">0</div>
+            <div class="stat-tile-desc">Curriculum fully completed</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Lessons Completed</div>
+            <div class="stat-tile-value" id="crs-stat-lessons-completed">0</div>
+            <div class="stat-tile-desc">Persistent learning progress</div>
+          </div>
+        </div>
+
+        <!-- Domain Filter Tabs -->
+        <div style="margin-top: var(--space-lg);">
+          <div class="filter-tabs-group" id="courses-domain-filters">
+            <button class="btn-filter active" data-domain="ALL">All Courses</button>
+            <button class="btn-filter" data-domain="Statistical">Statistical</button>
+            <button class="btn-filter" data-domain="Technical">Technical</button>
+            <button class="btn-filter" data-domain="Digital Governance">Digital Governance</button>
+            <button class="btn-filter" data-domain="Behavioural / Managerial">Behavioural / Managerial</button>
+          </div>
+        </div>
+
+        <!-- Courses Grid Container -->
+        <div id="courses-list-container" style="margin-top: var(--space-md);">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 3 - COURSE DETAIL & CURRICULUM
+         ==================================================================== -->
+    <section id="view-course-detail" style="display: none; max-width: 1050px; margin: 0 auto;">
+      <div class="block-card block-card-accent">
+        <!-- Back Navigation Button -->
+        <div style="margin-bottom: var(--space-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-sm);">
+          <button id="btn-back-to-courses" class="btn btn-secondary btn-sm">
+            ← Back to Course Catalog
+          </button>
+          <div id="course-detail-source-badge"></div>
+        </div>
+
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h1 id="course-detail-title">Course Title</h1>
+          </div>
+          <span class="badge-pixel text-forest" id="course-detail-domain-badge">DOM</span>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--color-ink-muted); margin-bottom: var(--space-xs);" id="course-detail-meta">
+          CODE • DURATION • DIFFICULTY
+        </div>
+
+        <p id="course-detail-description" class="text-muted" style="margin-bottom: var(--space-lg); line-height: 1.5; font-size: 0.95rem;">
+          Description
+        </p>
+
+        <!-- Targeted Competencies Banner -->
+        <div class="explanation-box" style="margin-bottom: var(--space-lg);">
+          <strong>🎯 Targeted Competencies & Growth Impact:</strong>
+          <div id="course-detail-competencies-list" style="display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: 6px;"></div>
+        </div>
+
+        <!-- Progress Overview Banner -->
+        <div class="course-progress-banner" style="margin-bottom: var(--space-lg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 700; font-size: 0.9rem;">COURSE PROGRESSION</span>
+            <span id="course-detail-progress-label" style="font-family: var(--font-mono); font-weight: 700; font-size: 0.9rem;">0% (0 / 0 Lessons)</span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="course-detail-progress-bar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Course Curriculum / Lessons Section -->
+        <div style="margin-top: var(--space-xl);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+            <h2>COURSE CURRICULUM & LESSONS</h2>
+            <span class="badge-pixel text-forest" id="course-detail-lessons-count">0 LESSONS</span>
+          </div>
+          <div id="course-detail-lessons-list" class="curriculum-lessons-list">
+            <!-- Lessons injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Course Knowledge Quiz Section -->
+        <div style="margin-top: var(--space-xl);" id="course-detail-quiz-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+            <h2>KNOWLEDGE VERIFICATION QUIZ</h2>
+            <span class="badge-pixel text-ochre">PRACTICE CHECK</span>
+          </div>
+          <div id="course-detail-quiz-container">
+            <!-- Quiz cards injected dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 3 - INTERACTIVE LESSON READER
+         ==================================================================== -->
+    <section id="view-lesson-detail" style="display: none; max-width: 960px; margin: 0 auto;">
+      <div class="block-card block-card-accent">
+        <!-- Top Nav & Breadcrumb -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-sm);">
+          <button id="btn-lesson-back-to-course" class="btn btn-secondary btn-sm">
+            ← Return to Course
+          </button>
+          <div id="lesson-header-breadcrumb" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--color-ink-muted);">
+            Course / Lesson
+          </div>
+        </div>
+
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h1 id="lesson-detail-title">Lesson Title</h1>
+          </div>
+          <div id="lesson-detail-status-badge">
+            <span class="badge-pixel text-ochre">IN PROGRESS</span>
+          </div>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--color-ink-muted); margin-bottom: var(--space-md);" id="lesson-detail-meta">
+          Lesson 1 of 3 • 45 Minutes Est.
+        </div>
+
+        <!-- Lesson Main Content Body -->
+        <div class="lesson-content-card" id="lesson-content-body">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Attached Learning Materials -->
+        <div style="margin-top: var(--space-xl);" id="lesson-materials-section">
+          <h3 style="margin-bottom: var(--space-sm);">OFFICIAL LEARNING MATERIALS & REFERENCE DOCUMENTS</h3>
+          <div id="lesson-materials-list" class="materials-list-container">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Completion Action Banner -->
+        <div class="lesson-completion-banner" style="margin-top: var(--space-xl);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-md);">
+            <div>
+              <div id="lesson-completion-status-text" style="font-weight: 700; font-size: 1rem;">
+                Lesson Progress Status
+              </div>
+              <div class="text-muted" style="font-size: 0.85rem;" id="lesson-completion-status-desc">
+                Click to record completion in your permanent official learning profile.
+              </div>
+            </div>
+            <button id="btn-mark-lesson-complete" class="btn btn-primary btn-lg">
+              ✓ MARK LESSON AS COMPLETED
+            </button>
+          </div>
+        </div>
+
+        <!-- Prev / Next Navigation -->
+        <div style="margin-top: var(--space-lg); padding-top: var(--space-md); border-top: var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+          <button id="btn-lesson-prev" class="btn btn-secondary">
+            ← Previous Lesson
+          </button>
+          <button id="btn-lesson-next" class="btn btn-primary">
+            Next Lesson →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 3 - QUIZZES CATALOGUE
+         ==================================================================== -->
+    <section id="view-quizzes-list" style="display: none;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>KNOWLEDGE VERIFICATION QUIZZES</h2>
+          </div>
+          <span class="badge-pixel text-forest">STAGE 3 PRACTICE</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md);">
+          Evaluate your understanding with course-specific verification quizzes. All quizzes are scored strictly server-side and recorded in your official training attempts.
+        </p>
+
+        <div id="quizzes-grid-container" class="recommendations-grid">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 3 - INTERACTIVE QUIZ
+         ==================================================================== -->
+    <section id="view-quiz-detail" style="display: none; max-width: 900px; margin: 0 auto;">
+      <div class="block-card block-card-accent">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-sm);">
+          <button id="btn-quiz-cancel" class="btn btn-secondary btn-sm">
+            ← Return to Course
+          </button>
+          <span class="badge-pixel text-forest" id="quiz-header-badge">KNOWLEDGE CHECK</span>
+        </div>
+
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h1 id="quiz-detail-title">Quiz Title</h1>
+          </div>
+          <span class="badge-pixel text-ochre" id="quiz-pass-mark-badge">PASS: 70%</span>
+        </div>
+
+        <p id="quiz-detail-description" class="text-muted" style="margin-bottom: var(--space-md);">
+          Description
+        </p>
+
+        <!-- Quiz Progress Bar -->
+        <div style="margin-bottom: var(--space-lg);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+            <span>QUIZ PROGRESS</span>
+            <span id="quiz-progress-text">0 / 3 Questions Answered</span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="quiz-progress-bar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Quiz Questions Form -->
+        <form id="form-quiz">
+          <div id="quiz-questions-container">
+            <!-- Questions injected dynamically -->
+          </div>
+
+          <div style="margin-top: var(--space-xl); padding-top: var(--space-md); border-top: var(--border-block); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-md);">
+            <button type="button" id="btn-cancel-quiz-form" class="btn btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" id="btn-submit-quiz" class="btn btn-primary btn-lg">
+              SUBMIT QUIZ FOR EVALUATION →
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 3 - QUIZ RESULT & REVIEW
+         ==================================================================== -->
+    <section id="view-quiz-result" style="display: none; max-width: 960px; margin: 0 auto;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h1 id="quiz-result-title">QUIZ EVALUATION RESULT</h1>
+          </div>
+          <span class="badge-pixel text-forest" id="quiz-result-pass-badge">PASSED</span>
+        </div>
+
+        <!-- Quiz Result Metrics -->
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Final Score</div>
+            <div class="stat-tile-value" id="quiz-res-stat-score">0.0%</div>
+            <div class="stat-tile-desc" id="quiz-res-stat-pass-desc">Pass Mark: 70.0%</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Accuracy</div>
+            <div class="stat-tile-value text-forest" id="quiz-res-stat-correct">0 / 0</div>
+            <div class="stat-tile-desc">Questions answered correctly</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Evaluation Engine</div>
+            <div class="stat-tile-value" style="font-size: 1.1rem; color: var(--color-forest);">SERVER-VERIFIED</div>
+            <div class="stat-tile-desc">Calculated & persisted in SQLite</div>
+          </div>
+        </div>
+
+        <!-- Question Review Accordion -->
+        <div style="margin-top: var(--space-xl);">
+          <h2 style="margin-bottom: var(--space-md);">QUESTION-BY-QUESTION REVIEW & EXPLANATIONS</h2>
+          <div id="quiz-review-container">
+            <!-- Review items injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+          <button id="btn-quiz-res-to-course" class="btn btn-primary">
+            ← Return to Course
+          </button>
+          <button id="btn-quiz-res-retake" class="btn btn-secondary">
+            Retake Quiz
+          </button>
+          <button id="btn-quiz-res-to-catalog" class="btn btn-secondary">
+            Explore Course Catalog
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
          VIEW: ADMIN DASHBOARD
          ==================================================================== -->
     <section id="view-admin-dashboard" style="display: none;">

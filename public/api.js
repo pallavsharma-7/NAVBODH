@@ -162,6 +162,34 @@
       }
     },
 
+    // Learning Shortcuts (Stage 3: Owner Pathika)
+    learning: {
+      getCourses() {
+        return API.get('/api/courses');
+      },
+      getCourse(id) {
+        return API.get(`/api/courses/${id}`);
+      },
+      getCourseLessons(id) {
+        return API.get(`/api/courses/${id}/lessons`);
+      },
+      getLesson(id) {
+        return API.get(`/api/lessons/${id}`);
+      },
+      completeLesson(id) {
+        return API.post(`/api/lessons/${id}/complete`, {});
+      },
+      getQuizzes() {
+        return API.get('/api/quizzes');
+      },
+      getQuiz(id) {
+        return API.get(`/api/quizzes/${id}`);
+      },
+      submitQuiz(id, answers) {
+        return API.post(`/api/quizzes/${id}/submit`, { answers });
+      }
+    },
+
     // Admin Shortcuts
     admin: {
       getOverview() {
