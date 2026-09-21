@@ -1,6 +1,7 @@
 const express = require('express');
 const { getDb } = require('./db');
 const { requireAuth } = require('./middleware/auth');
+const { syncUserGamification } = require('./routes-gamification');
 
 const router = express.Router();
 
@@ -589,6 +590,13 @@ router.post('/assessment/submit', requireAuth, (req, res) => {
     });
 
     const result = persistTransaction();
+
+    // Trigger Gamification event sync
+    try {
+      syncUserGamification(req.user.id);
+    } catch (gErr) {
+      console.error('[Gamification] Error syncing after assessment submission:', gErr.message);
+    }
 
     return res.json({
       success: true,

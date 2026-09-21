@@ -1,11 +1,11 @@
 # NAVBODH (नवबोध)
 ### Personalized Skill Intelligence & Learning Platform for India's Official Statistical System
 
-> **Stage 3: Learning** | Smart India Hackathon 2026  
+> **Stage 4: Gamification** | Smart India Hackathon 2026  
 > **Repository:** [pallavsharma-7/NAVBODH](https://github.com/pallavsharma-7/NAVBODH)  
-> **Current Branch:** `pathika-learning`  
-> **Predecessor Branch:** `rucha-intelligence` (Commit `6d71e0e` / Merged `0d4c404`)  
-> **Contributor (Learning):** Pathika  
+> **Current Branch:** `pallav-gamification`  
+> **Predecessor Branch:** `pathika-learning` (Commit `1993c20`)  
+> **Contributor (Gamification):** Pallav  
 
 ---
 
@@ -310,6 +310,47 @@ NAVBODH/
 
 ---
 
+## 4. Stage 4: Gamification Module Architecture
+
+Stage 4 introduces a persistent, baseline-aware, explainable **Gamification & Reward Ledger Engine** that rewards genuine learning progress and competency improvement without altering Core baseline immutability:
+
+### 1. Reward Event System & Ledger
+- **Persistent Event Ledger:** Uses `reward_ledger` with `event_key TEXT UNIQUE` to guarantee DB-level duplicate reward protection.
+- **Deterministic Point Values:**
+  - **Baseline Assessment Submission:** +50 points (`assessment_completed`)
+  - **Subsequent Assessment Submission:** +30 points (`assessment_completed`)
+  - **Lesson Completed:** +15 points (`lesson_completed`)
+  - **Quiz Passed (score $\ge 70\%$):** +25 points (`quiz_completed`)
+  - **Quiz Perfect Score ($100\%$):** +15 bonus points (`quiz_perfect_score`)
+  - **Growth Milestones:** 10% (+40 pts), 20% (+60 pts), 35% (+80 pts), 50% (+100 pts)
+  - **Achievement Unlock:** +25 points (`achievement_awarded`)
+  - **Learning Streak Milestones:** 3-Day (+30 pts), 7-Day (+70 pts)
+- **Duplicate Protection:** API refreshes, repeated quiz submissions, or re-completing lessons use `INSERT OR IGNORE` with unique event keys (e.g. `lesson_<id>`, `quiz_attempt_<id>`, `milestone_10`). Points are awarded **strictly once** per causal event.
+
+### 2. Baseline-Aware Growth Calculation
+- **Formula:** $\text{Growth \%} = \frac{\text{Current Score} - \text{Baseline Score}}{\text{Baseline Score}} \times 100$
+- **Baseline Immutability:** `employee_competencies.baseline_score` is strictly read-only and never modified by Gamification.
+- **Zero-Baseline Protection:** When $\text{Baseline Score} = 0$:
+  - If $\text{Current Score} = 0$, returns `growth_percent: 0.0`, `growth_display: "0.0%"`.
+  - If $\text{Current Score} > 0$, returns `growth_percent: 0.0`, `growth_display: "New Skill (+X pts)"`, `is_zero_baseline: true`.
+  - Never produces `NaN`, `Infinity`, or `-Infinity`.
+
+### 3. Achievements & Recognition
+- 12 official achievements across growth, learning, streak, and domain mastery categories (`ACH_FIRST_BASELINE`, `ACH_FIRST_LESSON`, `ACH_FIRST_QUIZ`, `ACH_COURSE_COMPLETE`, `ACH_STREAK_3`, `ACH_STREAK_7`, `ACH_GROWTH_10PCT`, `ACH_GROWTH_20PCT`, `ACH_GROWTH_35PCT`, `ACH_GROWTH_50PCT`, `ACH_STAT_PIONEER`, `ACH_DIGITAL_CHAMPION`).
+- Unlocked achievements persist in `employee_achievements` with `UNIQUE(user_id, achievement_id)` constraint.
+
+### 4. Learning Streak Engine
+- Analyzes distinct activity calendar dates (`YYYY-MM-DD`) from `lesson_completions.completed_at`, `quiz_attempts.attempted_at`, and `assessment_attempts.completed_at`.
+- Calculates current active streak and longest historical streak. Page refreshes do not inflate streak counters.
+
+### 5. Deterministic Growth Leaderboard
+- **Primary Rank Metric:** Growth %
+- **Tie-Breaker 1:** Total Points Earned
+- **Tie-Breaker 2:** Meaningful Completions Count (Lessons + Passed Quizzes)
+- **Tie-Breaker 3:** Employee ID ASC (Stable deterministic ordering with zero randomness)
+
+---
+
 ## 8. Demo Credentials
 
 | Username | Password | Role | Name | Department / Cadre |
@@ -327,17 +368,19 @@ NAVBODH/
 npm install
 ```
 
-### 2. Run Test Suite (Core + Intelligence + Learning + Frontend Integration)
+### 2. Run Complete Test Suite
 ```bash
 npm test
 ```
-*Executes all 52 automated tests across `test-core.js` (17 tests), `test-intelligence.js` (10 tests), `test-learning.js` (13 tests), and `test-frontend-integration.js` (12 tests).*
+*Executes all 70 automated tests across `test-core.js` (17 tests), `test-intelligence.js` (10 tests), `test-learning.js` (13 tests), `test-gamification.js` (17 tests), and `test-frontend-integration.js` (13 tests).*
 
 Individual test suites can be executed via:
 ```bash
 npm run test:core
 npm run test:intelligence
 npm run test:learning
+npm run test:gamification
+npm run test:frontend
 ```
 
 ### 3. Run Application
@@ -351,16 +394,15 @@ Access the application at: **`http://localhost:3000`**
 ## 10. Known Limitations & Explicit Disclaimers
 
 1. **Course Catalog Demo Labels:** Courses marked with `sample_nssta_tpac`, `sample_igot`, and `local_demo` represent sample training fixtures. There are **no live connections, credentials, or scraping** of external government portals.
-2. **Server-Side Scoring & Integrity:** All quiz scoring is evaluated server-side. Quiz question endpoints never reveal answer keys prior to submission.
-3. **Immutability of Baseline:** Learning progress updates `learning_progress` and `lesson_completions` without modifying initial `employee_competencies.baseline_score`.
-4. **Future Stages:** Gamification, badges, rewards, and leaderboards are scheduled for Stage 4 (Pallav). Admin analytics and heatmaps are scheduled for Stage 5 (Palak).
+2. **Server-Side Scoring & Integrity:** All quiz scoring and gamification calculations are evaluated server-side.
+3. **Immutability of Baseline:** Baseline competency scores (`baseline_score`) remain permanent and unchanged throughout Gamification.
+4. **Future Stages:** Admin workforce skill heatmaps and macro analytics are scheduled for Stage 5 (Palak).
 
 ---
 
-## 11. Information for Next Contributor (Stage 4: Pallav)
+## 11. Information for Next Contributor (Stage 5: Palak)
 
-- **Next Stage:** Stage 4 — Gamification (`pallav-gamification`)
-- **Starting Branch:** Branch off from `pathika-learning`
-- **Ownership:** Gamification dashboard, badge/reward triggers upon course/quiz completion, streak calculations, reward ledger (`reward_ledger`, `achievement_definitions`, `employee_achievements`), and division leaderboards.
-- **APIs to Consume:** Consume `learning_progress`, `lesson_completions`, and `quiz_attempts` to reward officers upon achieving learning milestones.
-- **Rule of Immutability:** Preserve `baseline_score` immutability in `employee_competencies`.
+- **Next Stage:** Stage 5 — Admin Analytics & Workforce Heatmaps (`palak-admin`)
+- **Starting Branch:** Branch off from `pallav-gamification`
+- **Ownership:** Admin dashboard analytics, workforce skill deficiency heatmaps, division macro reports, course enrollment analytics, and quiz difficulty distribution reviews.
+- **Rule of Immutability:** Preserve Core, Intelligence, Learning, and Gamification contracts without breaking existing functionality.

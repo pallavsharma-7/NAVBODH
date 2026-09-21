@@ -59,6 +59,20 @@
     viewQuizDetail: document.getElementById('view-quiz-detail'),
     viewQuizResult: document.getElementById('view-quiz-result'),
 
+    // Stage 4 Gamification Elements
+    viewEmpGamification: document.getElementById('view-employee-gamification'),
+    gamStatTotalPoints: document.getElementById('gam-stat-total-points'),
+    gamStatGrowthPct: document.getElementById('gam-stat-growth-pct'),
+    gamStatGrowthDesc: document.getElementById('gam-stat-growth-desc'),
+    gamStatStreak: document.getElementById('gam-stat-streak'),
+    gamStatStreakDesc: document.getElementById('gam-stat-streak-desc'),
+    gamStatRank: document.getElementById('gam-stat-rank'),
+    gamStatRankDesc: document.getElementById('gam-stat-rank-desc'),
+    gamMilestonesContainer: document.getElementById('gam-milestones-container'),
+    gamAchievementsContainer: document.getElementById('gam-achievements-container'),
+    gamLeaderboardTbody: document.getElementById('gam-leaderboard-tbody'),
+    gamLedgerTbody: document.getElementById('gam-ledger-tbody'),
+
     // Login
     formLogin: document.getElementById('form-login'),
     inputIdentifier: document.getElementById('input-identifier'),
@@ -234,6 +248,7 @@
     if (els.viewQuizzesList) els.viewQuizzesList.style.display = 'none';
     if (els.viewQuizDetail) els.viewQuizDetail.style.display = 'none';
     if (els.viewQuizResult) els.viewQuizResult.style.display = 'none';
+    if (els.viewEmpGamification) els.viewEmpGamification.style.display = 'none';
     els.viewAdminDashboard.style.display = 'none';
     els.viewPlaceholder.style.display = 'none';
   }
@@ -316,6 +331,15 @@
         els.appNavBar.style.display = 'block';
         els.viewEmpAssistant.style.display = 'block';
         loadAssistantView();
+        break;
+
+      case 'gamification':
+      case 'achievements':
+      case 'leaderboard':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        if (els.viewEmpGamification) els.viewEmpGamification.style.display = 'block';
+        loadGamificationView();
         break;
 
       case 'learning':
@@ -427,11 +451,11 @@
         { id: 'learning', label: 'Learning', future: false },
         { id: 'quizzes', label: 'Quizzes', future: false },
         { id: 'assistant', label: 'Study Assistant', future: false },
+        { id: 'gamification', label: 'Gamification & Badges', future: false },
+        { id: 'leaderboard', label: 'Leaderboard', future: false },
         { id: 'assessment', label: 'Assessment', future: false },
         { id: 'result', label: 'Results', future: false },
-        { id: 'profile', label: 'Profile', future: false },
-        { id: 'achievements', label: 'Achievements', future: true, stage: 'Stage 4', owner: 'Pallav', desc: 'Official badges, skill milestones, and recognition trophies.' },
-        { id: 'leaderboard', label: 'Leaderboard', future: true, stage: 'Stage 4', owner: 'Pallav', desc: 'Growth-based leaderboard tracking individual improvement from baseline.' }
+        { id: 'profile', label: 'Profile', future: false }
       ];
 
       employeeTabs.forEach(t => {
@@ -2247,6 +2271,94 @@
       els.btnQuizResToCatalog.addEventListener('click', () => {
         switchView('learning');
       });
+    }
+  }
+
+  /**
+   * Load and render Stage 4 Gamification view
+   */
+  async function loadGamificationView() {
+    try {
+      const data = await window.API.gamification.getOverview();
+      
+      // Render Metrics
+      if (els.gamStatTotalPoints) els.gamStatTotalPoints.textContent = data.total_points || 0;
+      if (els.gamStatGrowthPct) els.gamStatGrowthPct.textContent = data.growth ? data.growth.growth_display : '0.0%';
+      if (els.gamStatGrowthDesc) els.gamStatGrowthDesc.textContent = data.growth && data.growth.is_zero_baseline ? 'Safe zero baseline' : 'From baseline assessment';
+      if (els.gamStatStreak) els.gamStatStreak.textContent = `${data.streak ? data.streak.current_streak_days : 0} days`;
+      if (els.gamStatStreakDesc) els.gamStatStreakDesc.textContent = `Longest: ${data.streak ? data.streak.longest_streak_days : 0} days`;
+      if (els.gamStatRank) els.gamStatRank.textContent = `#${data.rank ? data.rank.rank : 1}`;
+      if (els.gamStatRankDesc) els.gamStatRankDesc.textContent = `Of ${data.rank ? data.rank.total_participants : 1} officers`;
+
+      // Render Milestones Track
+      if (els.gamMilestonesContainer && Array.isArray(data.milestones)) {
+        els.gamMilestonesContainer.innerHTML = data.milestones.map(m => `
+          <div class="milestone-node ${m.is_achieved ? 'achieved' : ''}">
+            <span class="milestone-node-badge">${m.is_achieved ? '✓ UNLOCKED' : 'LOCKED'}</span>
+            <div style="font-weight: 700; font-size: 0.92rem; margin-top: 4px;">${m.title}</div>
+            <div style="font-size: 0.8rem; color: var(--color-ink-muted); margin-top: 2px;">Reward: +${m.points} points</div>
+          </div>
+        `).join('');
+      }
+
+      // Render Achievements Grid
+      if (els.gamAchievementsContainer && Array.isArray(data.achievements)) {
+        els.gamAchievementsContainer.innerHTML = data.achievements.map(a => `
+          <div class="achievement-card ${a.is_unlocked ? 'unlocked' : ''}">
+            <div class="achievement-icon-box">
+              ${a.is_unlocked ? '🏆' : '🔒'}
+            </div>
+            <div>
+              <div style="font-weight: 700; font-size: 0.92rem;">${a.title}</div>
+              <div style="font-size: 0.8rem; color: var(--color-ink-muted); margin-top: 2px;">${a.description}</div>
+              <div style="font-size: 0.75rem; margin-top: 4px; font-weight: 700; color: ${a.is_unlocked ? 'var(--color-forest)' : 'var(--color-ink-muted)'};">
+                ${a.is_unlocked ? `Unlocked • ${new Date(a.unlocked_at).toLocaleDateString()}` : 'Locked Badge'}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Fetch and Render Leaderboard Table
+      const leadData = await window.API.gamification.getLeaderboard();
+      if (els.gamLeaderboardTbody && Array.isArray(leadData.leaderboard)) {
+        const currentUserId = state.currentUser ? state.currentUser.id : null;
+        els.gamLeaderboardTbody.innerHTML = leadData.leaderboard.map(item => {
+          const isMe = item.employee_id === currentUserId;
+          const rankClass = item.rank <= 3 ? `rank-${item.rank}` : '';
+          return `
+            <tr class="${isMe ? 'current-user-row' : ''}">
+              <td><span class="rank-tag ${rankClass}">#${item.rank}</span></td>
+              <td>${item.full_name} ${isMe ? '<strong>(You)</strong>' : ''}</td>
+              <td>${item.department_name}</td>
+              <td><span class="badge-pixel ${item.growth_percent > 0 ? 'text-forest' : ''}">${item.growth_display}</span></td>
+              <td><strong>${item.total_points} pts</strong></td>
+              <td>🔥 ${item.current_streak} days</td>
+              <td>${item.meaningful_completions} units</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Render Ledger Audit History
+      if (els.gamLedgerTbody && Array.isArray(data.recent_rewards)) {
+        if (data.recent_rewards.length === 0) {
+          els.gamLedgerTbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--color-ink-muted);">No rewards recorded yet. Complete lessons or assessments to earn points!</td></tr>`;
+        } else {
+          els.gamLedgerTbody.innerHTML = data.recent_rewards.map(r => `
+            <tr>
+              <td><span style="font-size: 0.8rem; font-family: var(--font-mono);">${new Date(r.created_at).toLocaleString()}</span></td>
+              <td><span class="badge-pixel text-forest">${r.event_type}</span></td>
+              <td><strong style="color: var(--color-forest);">+${r.points} pts</strong></td>
+              <td>${r.description || '--'}</td>
+            </tr>
+          `).join('');
+        }
+      }
+
+    } catch (err) {
+      console.error('[Frontend] Error loading gamification view:', err);
+      if (window.showToast) window.showToast('Could not load gamification details.', 'error');
     }
   }
 

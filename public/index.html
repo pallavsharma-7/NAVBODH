@@ -1007,6 +1007,122 @@
     </section>
 
     <!-- ====================================================================
+         VIEW: STAGE 4 - GAMIFICATION & LEADERBOARD (OWNER: PALLAV)
+         ==================================================================== -->
+    <section id="view-employee-gamification" style="display: none; max-width: 1080px; margin: 0 auto;">
+      <!-- Hero / Overview Card -->
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>GAMIFICATION & REWARD LEDGER</h2>
+          </div>
+          <span class="badge-pixel text-forest">STAGE 4 OPERATIONAL</span>
+        </div>
+
+        <p class="text-muted" style="margin-bottom: var(--space-md); font-size: 0.88rem;">
+          Track your skill growth from your permanent baseline, earn points for completing lessons and passing quizzes, unlock achievements, and view your official growth ranking.
+        </p>
+
+        <!-- Metrics Grid -->
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Total Points Earned</div>
+            <div class="stat-tile-value text-forest" id="gam-stat-total-points">0</div>
+            <div class="stat-tile-desc">Reward ledger total</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Baseline Skill Growth</div>
+            <div class="stat-tile-value text-ochre" id="gam-stat-growth-pct">0.0%</div>
+            <div class="stat-tile-desc" id="gam-stat-growth-desc">From permanent baseline</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Active Streak</div>
+            <div class="stat-tile-value text-copper" id="gam-stat-streak">0 days</div>
+            <div class="stat-tile-desc" id="gam-stat-streak-desc">Consecutive activity</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Leaderboard Rank</div>
+            <div class="stat-tile-value" id="gam-stat-rank">#--</div>
+            <div class="stat-tile-desc" id="gam-stat-rank-desc">Among official officers</div>
+          </div>
+        </div>
+
+        <!-- Growth Milestones Section -->
+        <div style="margin-top: var(--space-xl);">
+          <div style="font-family: var(--font-brand); font-size: 0.88rem; margin-bottom: var(--space-xs);">
+            🎯 SKILL GROWTH MILESTONES
+          </div>
+          <p class="text-muted" style="font-size: 0.82rem; margin-bottom: var(--space-sm);">
+            Milestones are awarded once when your average competency score increases above baseline thresholds.
+          </p>
+          <div class="milestones-track" id="gam-milestones-container">
+            <!-- Dynamically injected -->
+          </div>
+        </div>
+
+        <!-- Achievements Grid Section -->
+        <div style="margin-top: var(--space-xl);">
+          <div style="font-family: var(--font-brand); font-size: 0.88rem; margin-bottom: var(--space-xs);">
+            🏆 OFFICIAL ACHIEVEMENTS & TROPHIES
+          </div>
+          <div class="achievements-grid" id="gam-achievements-container">
+            <!-- Dynamically injected -->
+          </div>
+        </div>
+
+        <!-- Official Leaderboard Section -->
+        <div style="margin-top: var(--space-xl);">
+          <div style="font-family: var(--font-brand); font-size: 0.88rem; margin-bottom: var(--space-xs);">
+            📊 OFFICIAL GROWTH LEADERBOARD
+          </div>
+          <p class="text-muted" style="font-size: 0.82rem; margin-bottom: var(--space-sm);">
+            Rankings are determined deterministically by Baseline Growth %, total points earned, meaningful completions, and officer ID.
+          </p>
+          <div style="overflow-x: auto; margin-top: var(--space-sm);">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Officer Name</th>
+                  <th>Department / Division</th>
+                  <th>Baseline Growth</th>
+                  <th>Total Points</th>
+                  <th>Streak</th>
+                  <th>Completions</th>
+                </tr>
+              </thead>
+              <tbody id="gam-leaderboard-tbody">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reward History Ledger Section -->
+        <div style="margin-top: var(--space-xl);">
+          <div style="font-family: var(--font-brand); font-size: 0.88rem; margin-bottom: var(--space-xs);">
+            📜 RECENT REWARD LEDGER (AUDIT TRAIL)
+          </div>
+          <div style="overflow-x: auto; margin-top: var(--space-sm);">
+            <table class="table-custom">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Event Type</th>
+                  <th>Points</th>
+                  <th>Explanation</th>
+                </tr>
+              </thead>
+              <tbody id="gam-ledger-tbody">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
          VIEW: GENERIC PLACEHOLDER FOR FUTURE MODULES
          ==================================================================== -->
     <section id="view-placeholder" style="display: none;">
