@@ -263,13 +263,14 @@ function initDatabase() {
       UNIQUE(user_id, lesson_id)
     );
 
-    -- 15. Reward Ledger Table (Future Gamification Foundation)
+    -- 15. Reward Ledger Table (Gamification Foundation)
     CREATE TABLE IF NOT EXISTS reward_ledger (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       event_type TEXT NOT NULL,
       points INTEGER NOT NULL DEFAULT 0,
       description TEXT,
+      event_key TEXT UNIQUE,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -316,7 +317,21 @@ function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz_id ON quiz_questions(quiz_id);
     CREATE INDEX IF NOT EXISTS idx_quiz_attempts_user_quiz ON quiz_attempts(user_id, quiz_id);
     CREATE INDEX IF NOT EXISTS idx_learning_progress_user_course ON learning_progress(user_id, course_id);
+    CREATE INDEX IF NOT EXISTS idx_reward_ledger_user_id ON reward_ledger(user_id);
+    CREATE INDEX IF NOT EXISTS idx_reward_ledger_event_key ON reward_ledger(event_key);
   `);
+
+  // Ensure event_key column exists if database was created with earlier schema version
+  try {
+    const tableInfo = database.prepare("PRAGMA table_info(reward_ledger)").all();
+    const hasEventKey = tableInfo.some(col => col.name === 'event_key');
+    if (!hasEventKey) {
+      database.exec("ALTER TABLE reward_ledger ADD COLUMN event_key TEXT;");
+      database.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_reward_ledger_event_key ON reward_ledger(event_key);");
+    }
+  } catch (e) {
+    // Ignore migration error if already exists
+  }
 
   return database;
 }

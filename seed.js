@@ -912,7 +912,15 @@ function seedDatabase() {
       ['ACH_FIRST_BASELINE', 'Baseline Established', 'Completed initial competency baseline assessment across all domains.', 'compass', 'milestone', JSON.stringify({ type: 'baseline_completed' })],
       ['ACH_STAT_PIONEER', 'Statistical Pioneer', 'Scored 80% or above in Statistical domain assessment.', 'chart-bar', 'domain', JSON.stringify({ domain: 'Statistical', score_threshold: 80 })],
       ['ACH_GROWTH_10PCT', 'Growth Momentum', 'Achieved 10% competency growth from initial baseline score.', 'trending-up', 'growth', JSON.stringify({ growth_percent: 10 })],
-      ['ACH_DIGITAL_CHAMPION', 'Digital Governance Champion', 'Demonstrated top-tier mastery in government cyber and data privacy compliance.', 'shield', 'governance', JSON.stringify({ domain: 'Digital Governance', score_threshold: 80 })]
+      ['ACH_GROWTH_20PCT', 'Skill Crusader', 'Achieved 20% competency growth from initial baseline score.', 'trending-up', 'growth', JSON.stringify({ growth_percent: 20 })],
+      ['ACH_GROWTH_35PCT', 'Domain Expert', 'Achieved 35% competency growth from initial baseline score.', 'star', 'growth', JSON.stringify({ growth_percent: 35 })],
+      ['ACH_GROWTH_50PCT', 'Master Specialist', 'Achieved 50% competency growth from initial baseline score.', 'crown', 'growth', JSON.stringify({ growth_percent: 50 })],
+      ['ACH_DIGITAL_CHAMPION', 'Digital Governance Champion', 'Demonstrated top-tier mastery in government cyber and data privacy compliance.', 'shield', 'governance', JSON.stringify({ domain: 'Digital Governance', score_threshold: 80 })],
+      ['ACH_FIRST_LESSON', 'Knowledge Seeker', 'Completed first learning lesson in NAVBODH Academy.', 'book-open', 'learning', JSON.stringify({ type: 'first_lesson' })],
+      ['ACH_FIRST_QUIZ', 'Quiz Master', 'Passed knowledge verification quiz with passing score.', 'award', 'learning', JSON.stringify({ type: 'first_quiz' })],
+      ['ACH_COURSE_COMPLETE', 'Course Champion', 'Completed all lessons in a full statistical training course.', 'graduation-cap', 'learning', JSON.stringify({ type: 'course_complete' })],
+      ['ACH_STREAK_3', 'Consistent Learner', 'Maintained an active 3-day learning streak.', 'zap', 'streak', JSON.stringify({ streak_days: 3 })],
+      ['ACH_STREAK_7', 'Dedicated Scholar', 'Maintained an active 7-day learning streak.', 'fire', 'streak', JSON.stringify({ streak_days: 7 })]
     ];
 
     for (const a of achievements) {

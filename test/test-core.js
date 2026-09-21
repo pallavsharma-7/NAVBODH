@@ -471,10 +471,10 @@ async function runTests() {
       assert.strictEqual(enrollRes.status, 501);
       assert.strictEqual(enrollRes.body.error.code, 'MODULE_UNDER_DEVELOPMENT');
 
-      // Gamification (Stage 4 - Future Placeholder for Pallav)
+      // Gamification (Stage 4 - Implemented by Pallav)
       const gamRes = await client.request('/api/gamification/leaderboard');
-      assert.strictEqual(gamRes.status, 501);
-      assert.strictEqual(gamRes.body.error.code, 'MODULE_UNDER_DEVELOPMENT');
+      assert.strictEqual(gamRes.status, 200);
+      assert.strictEqual(gamRes.body.success, true);
     });
 
     // ------------------------------------------------------------------------

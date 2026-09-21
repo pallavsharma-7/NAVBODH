@@ -190,6 +190,22 @@
       }
     },
 
+    // Gamification Shortcuts (Stage 4: Owner Pallav)
+    gamification: {
+      getOverview() {
+        return API.get('/api/gamification');
+      },
+      getRewards() {
+        return API.get('/api/gamification/rewards');
+      },
+      getLeaderboard() {
+        return API.get('/api/gamification/leaderboard');
+      },
+      getAchievements() {
+        return API.get('/api/gamification/achievements');
+      }
+    },
+
     // Admin Shortcuts
     admin: {
       getOverview() {

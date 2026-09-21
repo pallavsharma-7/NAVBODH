@@ -21,6 +21,7 @@
 const express = require('express');
 const { getDb } = require('./db');
 const { requireAuth } = require('./middleware/auth');
+const { syncUserGamification } = require('./routes-gamification');
 
 const router = express.Router();
 
@@ -621,6 +622,13 @@ router.post('/lessons/:id/complete', requireAuth, (req, res) => {
 
     const result = completeTransaction();
 
+    // Trigger Gamification event sync
+    try {
+      syncUserGamification(userId);
+    } catch (gErr) {
+      console.error('[Gamification] Error syncing after lesson completion:', gErr.message);
+    }
+
     return res.json({
       success: true,
       data: result
@@ -903,6 +911,13 @@ router.post('/quizzes/:id/submit', requireAuth, (req, res) => {
       INSERT INTO quiz_attempts (quiz_id, user_id, score, passed, details_json, attempted_at)
       VALUES (?, ?, ?, ?, ?, datetime('now'))
     `).run(quizId, userId, score, passed, detailsJson);
+
+    // Trigger Gamification event sync
+    try {
+      syncUserGamification(userId);
+    } catch (gErr) {
+      console.error('[Gamification] Error syncing after quiz submission:', gErr.message);
+    }
 
     return res.json({
       success: true,

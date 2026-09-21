@@ -228,6 +228,25 @@ async function runBrowserSimulation() {
     assert.ok(quizSubmitRes.body.data.question_review.length >= 3);
     console.log('✓ PASS');
 
+    // 12. Stage 4 Gamification: Profile Overview & Leaderboard Integrity
+    process.stdout.write('• Testing: GET /api/gamification & /api/gamification/leaderboard payload integrity... ');
+    const gamRes = await client.getJson('/api/gamification');
+    assert.strictEqual(gamRes.status, 200);
+    assert.strictEqual(gamRes.body.success, true);
+    assert.ok(gamRes.body.data.total_points > 0, 'Points awarded for assessment, lesson, quiz');
+    assert.ok(Array.isArray(gamRes.body.data.achievements));
+    assert.ok(Array.isArray(gamRes.body.data.milestones));
+
+    const leadRes = await client.getJson('/api/gamification/leaderboard');
+    assert.strictEqual(leadRes.status, 200);
+    assert.strictEqual(leadRes.body.success, true);
+    assert.ok(Array.isArray(leadRes.body.data.leaderboard));
+
+    // Refresh idempotency check
+    const refreshRes = await client.getJson('/api/gamification');
+    assert.strictEqual(refreshRes.body.data.total_points, gamRes.body.data.total_points, 'Points remain unchanged on refresh');
+    console.log('✓ PASS');
+
     // 12. Logout
     process.stdout.write('• Testing: Official logout & session invalidation... ');
     const logoutRes = await client.postJson('/api/auth/logout', {});
