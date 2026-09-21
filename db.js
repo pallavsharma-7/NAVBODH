@@ -1,4 +1,55 @@
-const Database = require('better-sqlite3');
+let Database;
+try {
+  Database = require('better-sqlite3');
+  // Test constructor to ensure native binary bindings exist
+  new Database(':memory:').close();
+} catch (e) {
+  // If better-sqlite3 native addon is not available (e.g. Node 25+ environments where prebuilt binaries are not available),
+  // transparently use Node's built-in node:sqlite with identical API parity.
+  const { DatabaseSync } = require('node:sqlite');
+  Database = class BetterSqlite3Compat {
+    constructor(filePath) {
+      this._db = new DatabaseSync(filePath);
+    }
+    exec(sql) {
+      return this._db.exec(sql);
+    }
+    prepare(sql) {
+      const stmt = this._db.prepare(sql);
+      return {
+        run: (...args) => {
+          const res = stmt.run(...args);
+          return {
+            changes: Number(res.changes || 0),
+            lastInsertRowid: Number(res.lastInsertRowid || 0)
+          };
+        },
+        get: (...args) => stmt.get(...args),
+        all: (...args) => stmt.all(...args)
+      };
+    }
+    pragma(sql) {
+      return this._db.exec(`PRAGMA ${sql}`);
+    }
+    transaction(fn) {
+      return (...args) => {
+        this._db.exec('BEGIN');
+        try {
+          const res = fn(...args);
+          this._db.exec('COMMIT');
+          return res;
+        } catch (err) {
+          this._db.exec('ROLLBACK');
+          throw err;
+        }
+      };
+    }
+    close() {
+      return this._db.close();
+    }
+  };
+}
+
 const path = require('path');
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'navbodh.sqlite');
@@ -240,5 +291,6 @@ function initDatabase() {
 
 module.exports = {
   getDb,
-  initDatabase
+  initDatabase,
+  Database
 };

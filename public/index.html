@@ -377,6 +377,229 @@
     </section>
 
     <!-- ====================================================================
+         VIEW: STAGE 2 - SKILL GAPS IDENTIFICATION & PRIORITIZATION
+         ==================================================================== -->
+    <section id="view-employee-gaps" style="display: none;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>COMPETENCY DEFICIENCY & SKILL-GAP MATRIX</h2>
+          </div>
+          <span class="badge-pixel text-forest">INTELLIGENCE ENGINE</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md);">
+          Deterministic skill-gap evaluation calculated as <code>Gap = Target Score - Current Score</code>. Deficiencies are prioritized based on gap magnitude and operational competency impact.
+        </p>
+
+        <!-- Skill Gaps Metrics Overview -->
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Active Skill Gaps</div>
+            <div class="stat-tile-value text-danger" id="gaps-stat-active-count">0</div>
+            <div class="stat-tile-desc" id="gaps-stat-active-desc">Competencies below target</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">High Priority Deficiencies</div>
+            <div class="stat-tile-value text-ochre" id="gaps-stat-high-count">0</div>
+            <div class="stat-tile-desc">Gap ≥ 30.0 points</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Medium Priority</div>
+            <div class="stat-tile-value" id="gaps-stat-med-count">0</div>
+            <div class="stat-tile-desc">Gap 15.0 - 29.9 points</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Benchmarks Achieved</div>
+            <div class="stat-tile-value text-success" id="gaps-stat-met-count">0</div>
+            <div class="stat-tile-desc">Current Score ≥ Target</div>
+          </div>
+        </div>
+
+        <!-- Domain Filter Tabs -->
+        <div style="margin-top: var(--space-lg);">
+          <div class="filter-tabs-group" id="gaps-domain-filters">
+            <button class="btn-filter active" data-domain="ALL">All Domains (17)</button>
+            <button class="btn-filter" data-domain="Statistical">Statistical</button>
+            <button class="btn-filter" data-domain="Technical">Technical</button>
+            <button class="btn-filter" data-domain="Digital Governance">Digital Governance</button>
+            <button class="btn-filter" data-domain="Behavioural / Managerial">Behavioural / Managerial</button>
+          </div>
+        </div>
+
+        <!-- Skill Gaps List Container -->
+        <div id="gaps-list-container" style="margin-top: var(--space-md);">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Direct Actions -->
+        <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+          <button id="btn-gaps-to-recommendations" class="btn btn-primary">
+            View Personalized Course Recommendations →
+          </button>
+          <button id="btn-gaps-to-roadmap" class="btn btn-secondary">
+            View Dynamic Roadmap
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 2 - PERSONALIZED LEARNING RECOMMENDATIONS
+         ==================================================================== -->
+    <section id="view-employee-recommendations" style="display: none;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>PERSONALIZED COURSE RECOMMENDATIONS</h2>
+          </div>
+          <span class="badge-pixel text-forest">RULE-BASED INTELLIGENCE</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md);">
+          Targeted learning interventions mapped to your identified competency deficiencies across official training repositories (Sample iGOT-Karmayogi and NSSTA TPAC catalogs).
+        </p>
+
+        <!-- Explainability Note Box -->
+        <div class="explanation-box" style="margin-bottom: var(--space-md);">
+          <strong>🎯 Deterministic Recommendation Engine:</strong> Courses are prioritized based on the size and severity of your active skill gaps, taking into account multi-competency growth impacts.
+        </div>
+
+        <!-- Recommendations Grid -->
+        <div id="recommendations-container">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Direct Actions -->
+        <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+          <button id="btn-recs-to-roadmap" class="btn btn-primary">
+            View Step-by-Step Learning Roadmap →
+          </button>
+          <button id="btn-recs-to-gaps" class="btn btn-secondary">
+            ← Back to Skill Gaps
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 2 - DYNAMIC LEARNING ROADMAP
+         ==================================================================== -->
+    <section id="view-employee-roadmap" style="display: none;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>DYNAMIC COMPETENCY LEARNING ROADMAP</h2>
+          </div>
+          <span class="badge-pixel text-forest">ADAPTIVE PROGRESSION</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md);">
+          Sequential learning path organized into progressive phases. The roadmap dynamically recalculates whenever your assessment scores or competency benchmarks update.
+        </p>
+
+        <!-- Roadmap Summary Grid -->
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Roadmap Phases</div>
+            <div class="stat-tile-value text-forest" id="roadmap-stat-stages">0</div>
+            <div class="stat-tile-desc">Progressive milestones</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Deficiencies to Bridge</div>
+            <div class="stat-tile-value text-ochre" id="roadmap-stat-gaps">0</div>
+            <div class="stat-tile-desc">Active skill gaps</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Estimated Training</div>
+            <div class="stat-tile-value" id="roadmap-stat-hours">0 hrs</div>
+            <div class="stat-tile-desc">Curated course duration</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Primary Focus Wing</div>
+            <div class="stat-tile-value" style="font-size: 1.15rem;" id="roadmap-stat-domain">--</div>
+            <div class="stat-tile-desc">Highest deficiency volume</div>
+          </div>
+        </div>
+
+        <!-- Phases Container -->
+        <div id="roadmap-phases-container" style="margin-top: var(--space-lg);">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Actions -->
+        <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+          <button id="btn-roadmap-to-assistant" class="btn btn-primary">
+            Consult Study Assistant on Roadmap →
+          </button>
+          <button id="btn-roadmap-to-recs" class="btn btn-secondary">
+            ← Explore Course Catalog
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: STAGE 2 - AI STUDY ASSISTANT
+         ==================================================================== -->
+    <section id="view-employee-assistant" style="display: none; max-width: 960px; margin: 0 auto;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>INTELLIGENT STUDY ASSISTANT</h2>
+          </div>
+          <span class="badge-pixel text-forest">STAGE 2 DEMO</span>
+        </div>
+
+        <!-- Grounding Info Banner -->
+        <div class="assistant-grounding-banner" id="assistant-grounding-banner">
+          <div>
+            <strong>🛡️ Secure Context Grounding:</strong> Logged-in Officer: <span id="ast-officer-name">--</span> • Division: <span id="ast-officer-dept">--</span>
+          </div>
+          <div id="ast-grounding-badge">
+            <span class="badge-pixel text-forest">OFFICIAL DATA AUTHORITATIVE</span>
+          </div>
+        </div>
+
+        <p class="text-muted" style="margin-bottom: var(--space-sm); font-size: 0.88rem;">
+          Ask questions about your official competency evaluation, priority skill remediation, or tailored learning paths. Responses are explainable and derived directly from your official statistical benchmarks.
+        </p>
+
+        <!-- Quick Prompts Chips -->
+        <div class="quick-prompts-row">
+          <span style="font-size: 0.8rem; font-weight: 700; align-self: center; color: var(--color-ink-muted);">QUICK INQUIRIES:</span>
+          <button type="button" class="quick-prompt-chip" data-query="What should I learn first?">
+            📌 What should I learn first?
+          </button>
+          <button type="button" class="quick-prompt-chip" data-query="Explain my skill gaps">
+            📊 Explain my skill gaps
+          </button>
+          <button type="button" class="quick-prompt-chip" data-query="Summarize my learning roadmap">
+            🗺️ Summarize my roadmap
+          </button>
+          <button type="button" class="quick-prompt-chip" data-query="How can I improve in SQL?">
+            💻 How to improve in SQL?
+          </button>
+          <button type="button" class="quick-prompt-chip" data-query="How to strengthen Survey Sampling?">
+            📈 Strengthen Survey Sampling
+          </button>
+        </div>
+
+        <!-- Chat History Stream -->
+        <div class="chat-thread-container" id="chat-thread-container">
+          <!-- Chat messages injected dynamically -->
+        </div>
+
+        <!-- Inquiry Form -->
+        <form id="form-study-assistant">
+          <div style="display: flex; gap: var(--space-xs);">
+            <input type="text" id="input-assistant-query" class="form-control" placeholder="Ask a study inquiry (e.g. 'What is my highest priority competency deficiency?')..." autocomplete="off" required>
+            <button type="submit" id="btn-submit-assistant" class="btn btn-primary" style="white-space: nowrap;">
+              ASK ASSISTANT →
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ====================================================================
          VIEW: ADMIN DASHBOARD
          ==================================================================== -->
     <section id="view-admin-dashboard" style="display: none;">
@@ -493,7 +716,7 @@
       <div>
         <strong>NAVBODH</strong> — Skill Intelligence & Learning Platform for Official Statistics
         <div style="color: var(--color-sage-light); font-size: 0.75rem; margin-top: 2px;">
-          Stage 1: Core Foundation • Smart India Hackathon 2026
+          Stage 2: Intelligence • Smart India Hackathon 2026
         </div>
       </div>
       <div style="font-family: var(--font-mono); font-size: 0.75rem;">

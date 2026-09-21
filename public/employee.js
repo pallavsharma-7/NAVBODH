@@ -34,6 +34,10 @@
     viewEmpProfile: document.getElementById('view-employee-profile'),
     viewEmpAssessment: document.getElementById('view-employee-assessment'),
     viewEmpResult: document.getElementById('view-employee-result'),
+    viewEmpGaps: document.getElementById('view-employee-gaps'),
+    viewEmpRecommendations: document.getElementById('view-employee-recommendations'),
+    viewEmpRoadmap: document.getElementById('view-employee-roadmap'),
+    viewEmpAssistant: document.getElementById('view-employee-assistant'),
     viewAdminDashboard: document.getElementById('view-admin-dashboard'),
     viewPlaceholder: document.getElementById('view-placeholder'),
 
@@ -93,6 +97,37 @@
     btnResultToDashboard: document.getElementById('btn-result-to-dashboard'),
     btnRetakeAssessment: document.getElementById('btn-retake-assessment'),
 
+    // Skill Gaps View Elements
+    gapsStatActiveCount: document.getElementById('gaps-stat-active-count'),
+    gapsStatHighCount: document.getElementById('gaps-stat-high-count'),
+    gapsStatMedCount: document.getElementById('gaps-stat-med-count'),
+    gapsStatMetCount: document.getElementById('gaps-stat-met-count'),
+    gapsDomainFilters: document.getElementById('gaps-domain-filters'),
+    gapsListContainer: document.getElementById('gaps-list-container'),
+    btnGapsToRecommendations: document.getElementById('btn-gaps-to-recommendations'),
+    btnGapsToRoadmap: document.getElementById('btn-gaps-to-roadmap'),
+
+    // Recommendations View Elements
+    recommendationsContainer: document.getElementById('recommendations-container'),
+    btnRecsToRoadmap: document.getElementById('btn-recs-to-roadmap'),
+    btnRecsToGaps: document.getElementById('btn-recs-to-gaps'),
+
+    // Roadmap View Elements
+    roadmapStatStages: document.getElementById('roadmap-stat-stages'),
+    roadmapStatGaps: document.getElementById('roadmap-stat-gaps'),
+    roadmapStatHours: document.getElementById('roadmap-stat-hours'),
+    roadmapStatDomain: document.getElementById('roadmap-stat-domain'),
+    roadmapPhasesContainer: document.getElementById('roadmap-phases-container'),
+    btnRoadmapToAssistant: document.getElementById('btn-roadmap-to-assistant'),
+    btnRoadmapToRecs: document.getElementById('btn-roadmap-to-recs'),
+
+    // Study Assistant Elements
+    astOfficerName: document.getElementById('ast-officer-name'),
+    astOfficerDept: document.getElementById('ast-officer-dept'),
+    chatThreadContainer: document.getElementById('chat-thread-container'),
+    formStudyAssistant: document.getElementById('form-study-assistant'),
+    inputAssistantQuery: document.getElementById('input-assistant-query'),
+
     // Placeholder
     plBadge: document.getElementById('pl-badge'),
     plTitle: document.getElementById('pl-title'),
@@ -110,6 +145,10 @@
     els.viewEmpProfile.style.display = 'none';
     els.viewEmpAssessment.style.display = 'none';
     els.viewEmpResult.style.display = 'none';
+    if (els.viewEmpGaps) els.viewEmpGaps.style.display = 'none';
+    if (els.viewEmpRecommendations) els.viewEmpRecommendations.style.display = 'none';
+    if (els.viewEmpRoadmap) els.viewEmpRoadmap.style.display = 'none';
+    if (els.viewEmpAssistant) els.viewEmpAssistant.style.display = 'none';
     els.viewAdminDashboard.style.display = 'none';
     els.viewPlaceholder.style.display = 'none';
   }
@@ -166,6 +205,34 @@
         loadAssessmentResultView();
         break;
 
+      case 'skill-gaps':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewEmpGaps.style.display = 'block';
+        loadSkillGapsView();
+        break;
+
+      case 'recommendations':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewEmpRecommendations.style.display = 'block';
+        loadRecommendationsView();
+        break;
+
+      case 'roadmap':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewEmpRoadmap.style.display = 'block';
+        loadRoadmapView();
+        break;
+
+      case 'assistant':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        els.viewEmpAssistant.style.display = 'block';
+        loadAssistantView();
+        break;
+
       case 'admin-dashboard':
         els.headerAuthControls.style.display = 'flex';
         els.appNavBar.style.display = 'block';
@@ -218,12 +285,14 @@
     } else {
       const employeeTabs = [
         { id: 'dashboard', label: 'Dashboard', future: false },
-        { id: 'profile', label: 'Profile', future: false },
+        { id: 'skill-gaps', label: 'Skill Gaps', future: false },
+        { id: 'recommendations', label: 'Recommendations', future: false },
+        { id: 'roadmap', label: 'Roadmap', future: false },
+        { id: 'assistant', label: 'Study Assistant', future: false },
         { id: 'assessment', label: 'Assessment', future: false },
-        { id: 'result', label: 'Assessment Result', future: false },
-        { id: 'skill-gaps', label: 'Skill Gaps', future: true, stage: 'Stage 2', owner: 'Rucha', desc: 'Automated skill-gap identification and prioritized competency deficiency scoring.' },
+        { id: 'result', label: 'Results', future: false },
+        { id: 'profile', label: 'Profile', future: false },
         { id: 'learning', label: 'Learning', future: true, stage: 'Stage 3', owner: 'Pathika', desc: 'Interactive lessons, micro-modules, and self-paced statistical coursework.' },
-        { id: 'roadmap', label: 'Roadmap', future: true, stage: 'Stage 2', owner: 'Rucha', desc: 'Personalized step-by-step career and competency growth learning path.' },
         { id: 'quizzes', label: 'Quizzes', future: true, stage: 'Stage 3', owner: 'Pathika', desc: 'Competency post-tests and lesson verification knowledge checks.' },
         { id: 'achievements', label: 'Achievements', future: true, stage: 'Stage 4', owner: 'Pallav', desc: 'Official badges, skill milestones, and recognition trophies.' },
         { id: 'leaderboard', label: 'Leaderboard', future: true, stage: 'Stage 4', owner: 'Pallav', desc: 'Growth-based leaderboard tracking individual improvement from baseline.' }
@@ -528,135 +597,506 @@
   /**
    * Load Assessment Result View
    */
-  async function loadAssessmentResultView() {
+  /**
+   * ==========================================================================
+   * STAGE 2: INTELLIGENCE UI LOADERS & RENDERERS
+   * ==========================================================================
+   */
+
+  let currentGapsData = null;
+  let currentActiveDomainFilter = 'ALL';
+
+  /**
+   * Load Skill Gaps View
+   */
+  async function loadSkillGapsView() {
     try {
-      const res = await API.getAssessmentResult();
-      if (!res.has_result) {
-        els.resStatAttempt.textContent = 'No Attempts';
-        els.resStatAttemptDesc.textContent = 'No assessment taken yet.';
-        els.resStatOverall.textContent = '--';
-        els.resStatCorrectCount.textContent = '--';
-        els.resultCompetenciesGrid.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: var(--space-xl); color: var(--color-ink-muted);">
-            No assessment results available. Please take the initial assessment first.
+      if (!els.gapsListContainer) return;
+      els.gapsListContainer.innerHTML = '<div style="text-align:center; padding: var(--space-xl); color: var(--color-ink-muted);">Computing competency deficiencies...</div>';
+
+      const res = await API.intelligence.getSkillGaps();
+      currentGapsData = res;
+
+      if (!res.hasAssessment) {
+        els.gapsStatActiveCount.textContent = '0';
+        els.gapsStatHighCount.textContent = '0';
+        els.gapsStatMedCount.textContent = '0';
+        els.gapsStatMetCount.textContent = '0';
+
+        els.gapsListContainer.innerHTML = `
+          <div class="empty-state-card">
+            <h3 class="empty-state-title">No Assessment Completed Yet</h3>
+            <p class="empty-state-desc">${res.message || 'Complete your competency assessment to generate personalized skill gaps and recommendations.'}</p>
+            <button class="btn btn-primary" onclick="window.EmployeePortal.goToAssessment()">
+              Take Baseline Assessment Now →
+            </button>
           </div>
         `;
         return;
       }
 
-      els.resultBadgeType.textContent = res.is_baseline ? 'INITIAL BASELINE ESTABLISHED' : 'SUBSEQUENT ATTEMPT (CURRENT UPDATED)';
-      els.resStatAttempt.textContent = `Attempt #${res.attempt_number}`;
-      els.resStatAttemptDesc.textContent = res.is_baseline ? 'Permanent Baseline Record' : 'Current Scores Updated';
-      els.resStatOverall.textContent = `${res.overall_score}%`;
-      
-      const correctCount = (res.question_review || []).filter(q => q.is_correct).length;
-      els.resStatCorrectCount.textContent = `${correctCount} of ${(res.question_review || []).length} Correct`;
+      const summary = res.summary;
+      els.gapsStatActiveCount.textContent = summary.activeGapsCount;
+      els.gapsStatHighCount.textContent = summary.highPriorityCount;
+      els.gapsStatMedCount.textContent = summary.mediumPriorityCount;
+      els.gapsStatMetCount.textContent = summary.metCount;
 
-      // Render Competencies Grid
-      renderResultCompetencies(res.competencies);
-
-      // Render Review List
-      renderQuestionReview(res.question_review);
+      renderSkillGapsList(res.allCompetencies, currentActiveDomainFilter);
 
     } catch (err) {
-      console.error('Result load error:', err);
-      window.showToast('Could not load assessment result: ' + err.message, 'error');
+      console.error('Skill gaps load error:', err);
+      window.showToast('Could not load skill gaps: ' + err.message, 'error');
     }
   }
 
   /**
-   * Render Result Competencies Grid
+   * Render Skill Gaps Cards / Table
    */
-  function renderResultCompetencies(competencies) {
+  function renderSkillGapsList(competencies, filterDomain) {
     if (!competencies || competencies.length === 0) {
-      els.resultCompetenciesGrid.innerHTML = '<p>No competency data.</p>';
+      els.gapsListContainer.innerHTML = '<div class="empty-state-card"><p>No competency data available.</p></div>';
       return;
     }
 
-    let html = '';
-    competencies.forEach(c => {
+    const filtered = filterDomain === 'ALL'
+      ? competencies
+      : competencies.filter(c => c.domain === filterDomain);
+
+    if (filtered.length === 0) {
+      els.gapsListContainer.innerHTML = `
+        <div class="empty-state-card">
+          <p>No competencies found for domain: <strong>${filterDomain}</strong></p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '<div class="competencies-grid">';
+    filtered.forEach(c => {
       const domainClass = getDomainClass(c.domain);
-      const currentVal = c.current_score || 0;
-      const targetVal = c.target_score || 80;
-      const baselineVal = c.baseline_score || 0;
+      const isDeficiency = c.gap > 0;
+      let badgeClass = 'badge-priority-met';
+      let badgeLabel = 'BENCHMARK MET';
+
+      if (c.priority === 'high') {
+        badgeClass = 'badge-priority-high';
+        badgeLabel = 'HIGH PRIORITY';
+      } else if (c.priority === 'medium') {
+        badgeClass = 'badge-priority-medium';
+        badgeLabel = 'MEDIUM PRIORITY';
+      } else if (c.priority === 'low') {
+        badgeClass = 'badge-priority-low';
+        badgeLabel = 'LOW PRIORITY';
+      }
 
       html += `
-        <div class="competency-card">
+        <div class="competency-card" style="border-left: 5px solid ${isDeficiency ? (c.priority === 'high' ? 'var(--color-danger)' : 'var(--color-ochre)') : 'var(--color-forest)'};">
           <div>
             <div class="competency-header">
               <span class="domain-badge ${domainClass}">${c.domain}</span>
-              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink-muted);">${c.code}</span>
+              <span class="${badgeClass}">${badgeLabel}</span>
             </div>
-            <div class="competency-title">${c.name}</div>
+            <div class="competency-title">${c.competency || c.name}</div>
+            <div style="font-size: 0.8rem; color: var(--color-ink-muted); margin-top: 2px;">
+              ${c.description || ''}
+            </div>
           </div>
 
           <div style="margin-top: var(--space-sm);">
             <div class="competency-scores-row">
               <div class="score-item">
-                <span class="score-item-label">Baseline</span>
-                <span class="score-item-val" style="color: var(--color-sage);">${baselineVal}%</span>
-              </div>
-              <div class="score-item">
                 <span class="score-item-label">Current</span>
-                <span class="score-item-val" style="color: var(--color-forest-dark); font-size: 1.3rem;">${currentVal}%</span>
+                <span class="score-item-val" style="color: var(--color-forest-dark); font-size: 1.25rem;">${c.currentScore}%</span>
               </div>
               <div class="score-item">
                 <span class="score-item-label">Target</span>
-                <span class="score-item-val" style="color: var(--color-ochre);">${targetVal}%</span>
+                <span class="score-item-val" style="color: var(--color-ochre);">${c.targetScore}%</span>
+              </div>
+              <div class="score-item">
+                <span class="score-item-label">Deficiency Gap</span>
+                <span class="score-item-val ${isDeficiency ? 'gap-delta-negative' : 'gap-delta-positive'}">
+                  ${isDeficiency ? `-${c.gap} pts` : '0 pts'}
+                </span>
               </div>
             </div>
 
-            <div class="progress-bar-container">
-              <div class="progress-bar-fill" style="width: ${Math.min(currentVal, 100)}%;"></div>
+            <div class="progress-bar-container" style="margin-top: 6px;" title="Current: ${c.currentScore}% | Target: ${c.targetScore}%">
+              <div class="progress-bar-fill" style="width: ${Math.min(c.currentScore, 100)}%;"></div>
             </div>
+
+            ${isDeficiency ? `
+              <div style="margin-top: var(--space-xs); display: flex; justify-content: flex-end;">
+                <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.switchView('recommendations')" title="Explore courses addressing this gap">
+                  Find Training →
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    els.gapsListContainer.innerHTML = html;
+  }
+
+  /**
+   * Load Recommendations View
+   */
+  async function loadRecommendationsView() {
+    try {
+      if (!els.recommendationsContainer) return;
+      els.recommendationsContainer.innerHTML = '<div style="text-align:center; padding: var(--space-xl); color: var(--color-ink-muted);">Curating personalized learning recommendations...</div>';
+
+      const res = await API.intelligence.getRecommendations();
+
+      if (!res.hasAssessment) {
+        els.recommendationsContainer.innerHTML = `
+          <div class="empty-state-card">
+            <h3 class="empty-state-title">Competency Evaluation Required</h3>
+            <p class="empty-state-desc">${res.message || 'Complete your competency assessment to generate personalized skill gaps and recommendations.'}</p>
+            <button class="btn btn-primary" onclick="window.EmployeePortal.goToAssessment()">
+              Take Baseline Assessment Now →
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      if (!res.recommendations || res.recommendations.length === 0) {
+        els.recommendationsContainer.innerHTML = `
+          <div class="empty-state-card">
+            <h3 class="empty-state-title">No Active Recommendations Needed</h3>
+            <p class="empty-state-desc">${res.message || 'All your competency benchmarks have been achieved!'}</p>
+            <button class="btn btn-secondary" onclick="window.EmployeePortal.switchView('roadmap')">
+              View Learning Roadmap →
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      renderRecommendationsGrid(res.recommendations);
+
+    } catch (err) {
+      console.error('Recommendations load error:', err);
+      window.showToast('Could not load course recommendations: ' + err.message, 'error');
+    }
+  }
+
+  /**
+   * Render Recommendations Grid
+   */
+  function renderRecommendationsGrid(recommendations) {
+    let html = '<div class="recommendations-grid">';
+
+    recommendations.forEach(course => {
+      const domainClass = getDomainClass(course.domain);
+
+      let matchedPills = '';
+      (course.matchedCompetencies || []).forEach(m => {
+        let badgeClass = 'badge-priority-low';
+        if (m.priority === 'high') badgeClass = 'badge-priority-high';
+        else if (m.priority === 'medium') badgeClass = 'badge-priority-medium';
+
+        matchedPills += `
+          <span class="matched-comp-pill">
+            <strong>${m.name}</strong>
+            <span class="${badgeClass}">${m.priority.toUpperCase()} (-${m.gap} pts)</span>
+          </span>
+        `;
+      });
+
+      html += `
+        <div class="recommendation-card">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-xs); margin-bottom: 6px;">
+              <span class="domain-badge ${domainClass}">${course.domain || 'Statistical'}</span>
+              <span class="badge-source">${course.sourceDisplayName || course.source}</span>
+            </div>
+
+            <h3 style="font-size: 1.05rem; margin-bottom: 4px; color: var(--color-ink);">${course.title}</h3>
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink-muted); margin-bottom: var(--space-xs);">
+              ${course.courseCode} • ${course.durationHours} Hours • ${course.difficultyLevel.toUpperCase()}
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--color-ink-light); margin-bottom: var(--space-sm); line-height: 1.45;">
+              ${course.description || ''}
+            </p>
+
+            <div style="margin-bottom: var(--space-xs);">
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-ink-muted); margin-bottom: 4px;">TARGETED DEFICIENCIES:</div>
+              <div style="display: flex; flex-wrap: wrap;">
+                ${matchedPills}
+              </div>
+            </div>
+
+            <div class="reason-box">
+              <strong>Recommendation Rationale:</strong> ${course.reason}
+            </div>
+          </div>
+
+          <div style="margin-top: var(--space-md); padding-top: var(--space-sm); border-top: var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.78rem; color: var(--color-ink-muted); font-family: var(--font-mono);">
+              Relevance: ${course.rankingScore}
+            </span>
+            <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.switchView('roadmap')">
+              View in Roadmap →
+            </button>
           </div>
         </div>
       `;
     });
 
-    els.resultCompetenciesGrid.innerHTML = html;
+    html += '</div>';
+    els.recommendationsContainer.innerHTML = html;
   }
 
   /**
-   * Render Question Review Accordion
+   * Load Roadmap View
    */
-  function renderQuestionReview(reviewList) {
-    if (!reviewList || reviewList.length === 0) {
-      els.resultReviewContainer.innerHTML = '<p class="text-muted">Review details unavailable.</p>';
+  async function loadRoadmapView() {
+    try {
+      if (!els.roadmapPhasesContainer) return;
+      els.roadmapPhasesContainer.innerHTML = '<div style="text-align:center; padding: var(--space-xl); color: var(--color-ink-muted);">Generating dynamic learning roadmap...</div>';
+
+      const res = await API.intelligence.getRoadmap();
+
+      if (!res.hasAssessment) {
+        els.roadmapStatStages.textContent = '0';
+        els.roadmapStatGaps.textContent = '0';
+        els.roadmapStatHours.textContent = '0 hrs';
+        els.roadmapStatDomain.textContent = '--';
+
+        els.roadmapPhasesContainer.innerHTML = `
+          <div class="empty-state-card">
+            <h3 class="empty-state-title">Roadmap Uninitialized</h3>
+            <p class="empty-state-desc">${res.message || 'Complete your competency assessment to generate personalized skill gaps and recommendations.'}</p>
+            <button class="btn btn-primary" onclick="window.EmployeePortal.goToAssessment()">
+              Take Baseline Assessment Now →
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const summary = res.roadmapSummary;
+      els.roadmapStatStages.textContent = summary.totalStages;
+      els.roadmapStatGaps.textContent = summary.totalGapsToBridge;
+      els.roadmapStatHours.textContent = `${summary.totalEstimatedHours} hrs`;
+      els.roadmapStatDomain.textContent = summary.primaryFocusDomain;
+
+      renderRoadmapPhases(res.stages);
+
+    } catch (err) {
+      console.error('Roadmap load error:', err);
+      window.showToast('Could not load learning roadmap: ' + err.message, 'error');
+    }
+  }
+
+  /**
+   * Render Roadmap Phases & Milestones
+   */
+  function renderRoadmapPhases(stages) {
+    if (!stages || stages.length === 0) {
+      els.roadmapPhasesContainer.innerHTML = `
+        <div class="empty-state-card">
+          <h3 class="empty-state-title">Roadmap Complete!</h3>
+          <p class="empty-state-desc">All official statistical competency targets are satisfied.</p>
+        </div>
+      `;
       return;
     }
 
     let html = '';
-    reviewList.forEach((q, idx) => {
-      const isCorrect = q.is_correct;
-      const domainClass = getDomainClass(q.domain);
 
-      html += `
-        <div class="question-box" style="border-left: 5px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-danger)'};">
-          <div class="question-meta">
-            <span class="question-number">QUESTION ${idx + 1}</span>
-            <div>
-              <span class="domain-badge ${domainClass}">${q.domain}</span>
-              <span class="badge-pixel ${isCorrect ? 'text-success' : 'text-danger'}" style="margin-left: 8px;">
-                ${isCorrect ? '✓ CORRECT (+100)' : '✕ INCORRECT (0)'}
-              </span>
+    stages.forEach(stage => {
+      let phaseBadgeClass = 'badge-priority-met';
+      if (stage.priority === 'high') phaseBadgeClass = 'badge-priority-high';
+      else if (stage.priority === 'medium') phaseBadgeClass = 'badge-priority-medium';
+      else if (stage.priority === 'low') phaseBadgeClass = 'badge-priority-low';
+
+      let itemsHtml = '';
+      (stage.items || []).forEach(item => {
+        const domainClass = getDomainClass(item.domain);
+        const isDeficiency = item.gap > 0;
+
+        let coursesHtml = '';
+        if (item.recommendedCourses && item.recommendedCourses.length > 0) {
+          item.recommendedCourses.forEach(crs => {
+            coursesHtml += `
+              <div class="milestone-course-chip">
+                <div>
+                  <strong>${crs.title}</strong>
+                  <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-ink-muted); margin-left: 6px;">(${crs.sourceDisplayName || crs.source} • ${crs.durationHours} hrs)</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.switchView('recommendations')">
+                  Explore Course
+                </button>
+              </div>
+            `;
+          });
+        } else {
+          coursesHtml = `<div style="font-size: 0.8rem; color: var(--color-ink-muted); font-style: italic;">No specific course mapped yet. Follow self-paced applied exercises.</div>`;
+        }
+
+        itemsHtml += `
+          <div class="roadmap-milestone-item">
+            <div class="milestone-order-circle">${item.order}</div>
+            <div class="milestone-details">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-xs);">
+                <div>
+                  <span class="domain-badge ${domainClass}">${item.domain}</span>
+                  <span style="font-weight: 700; font-size: 1.05rem; margin-left: 6px;">${item.competency}</span>
+                  <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-ink-muted); margin-left: 6px;">(${item.competencyCode})</span>
+                </div>
+                <div>
+                  <span style="font-family: var(--font-mono); font-size: 0.84rem; font-weight: 700;">
+                    Score: ${item.currentScore} / Target: ${item.targetScore}
+                  </span>
+                  <span class="gap-delta-indicator ${isDeficiency ? 'gap-delta-negative' : 'gap-delta-positive'}" style="margin-left: 6px;">
+                    (${isDeficiency ? `-${item.gap} gap` : 'Met'})
+                  </span>
+                </div>
+              </div>
+
+              <div style="font-size: 0.86rem; color: var(--color-ink-light); margin: var(--space-xs) 0;">
+                <strong>Pedagogical Focus:</strong> ${item.suggestedFocus}
+              </div>
+
+              <div class="milestone-courses-list">
+                <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-ink-muted);">RECOMMENDED TRAINING:</div>
+                ${coursesHtml}
+              </div>
             </div>
           </div>
-          <div class="question-text">${q.question_text}</div>
+        `;
+      });
 
-          <div style="font-size: 0.88rem; margin: var(--space-xs) 0;">
-            <div><strong>Your Answer:</strong> <span style="color: ${isCorrect ? 'var(--color-success)' : 'var(--color-danger)'}; font-weight: 600;">${q.submitted_option_text}</span></div>
-            ${!isCorrect ? `<div><strong>Correct Answer:</strong> <span style="color: var(--color-success); font-weight: 600;">${q.correct_option_text}</span></div>` : ''}
+      html += `
+        <div class="roadmap-phase-container">
+          <div class="roadmap-phase-header">
+            <div>
+              <h3 style="margin-bottom: 2px;">${stage.title}</h3>
+              <p class="text-muted" style="font-size: 0.84rem;">${stage.description}</p>
+            </div>
+            <span class="${phaseBadgeClass}">${stage.badge}</span>
           </div>
-
-          <div class="explanation-box">
-            <strong>Statistical Insight:</strong> ${q.explanation || 'No explanation provided.'}
+          <div class="roadmap-milestones-list">
+            ${itemsHtml}
           </div>
         </div>
       `;
     });
 
-    els.resultReviewContainer.innerHTML = html;
+    els.roadmapPhasesContainer.innerHTML = html;
+  }
+
+  /**
+   * Load Study Assistant View
+   */
+  async function loadAssistantView() {
+    try {
+      if (state.currentUser) {
+        if (els.astOfficerName) els.astOfficerName.textContent = state.currentUser.full_name;
+        if (els.astOfficerDept) els.astOfficerDept.textContent = state.currentUser.department_name || 'MoSPI Division';
+      }
+
+      // Initial welcome message if thread is empty
+      if (els.chatThreadContainer && els.chatThreadContainer.children.length === 0) {
+        const initialMsg = `Hello ${state.currentUser ? state.currentUser.full_name : 'Officer'}. I am your NAVBODH Explainable Study Assistant.\n\nI can analyze your official statistical competency scores, break down your skill gaps, and guide your learning sequence.\n\nTry clicking any of the quick inquiries above or type a question below!`;
+        appendAssistantMessage(initialMsg, 'NAVBODH Rule-Based Intelligence Engine (Demo)');
+      }
+    } catch (err) {
+      console.error('Assistant view error:', err);
+    }
+  }
+
+  /**
+   * Append User Message to Chat Thread
+   */
+  function appendUserMessage(text) {
+    if (!els.chatThreadContainer) return;
+    const row = document.createElement('div');
+    row.className = 'chat-message-row user-msg';
+    row.innerHTML = `
+      <div class="chat-bubble user-bubble">${escapeHtml(text)}</div>
+    `;
+    els.chatThreadContainer.appendChild(row);
+    els.chatThreadContainer.scrollTop = els.chatThreadContainer.scrollHeight;
+  }
+
+  /**
+   * Append Assistant Message to Chat Thread
+   */
+  function appendAssistantMessage(text, engineLabel) {
+    if (!els.chatThreadContainer) return;
+    const row = document.createElement('div');
+    row.className = 'chat-message-row assistant-msg';
+    row.innerHTML = `
+      <div class="assistant-avatar-icon">NB</div>
+      <div>
+        <div class="chat-bubble assistant-bubble">${formatAssistantMarkdown(text)}</div>
+        <div style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--color-ink-muted); margin-top: 3px; padding-left: 4px;">
+          ${engineLabel || 'NAVBODH Intelligence Engine'}
+        </div>
+      </div>
+    `;
+    els.chatThreadContainer.appendChild(row);
+    els.chatThreadContainer.scrollTop = els.chatThreadContainer.scrollHeight;
+  }
+
+  /**
+   * Helper: Escape HTML
+   */
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /**
+   * Helper: Lightweight Markdown format for assistant output
+   */
+  function formatAssistantMarkdown(text) {
+    let safe = escapeHtml(text);
+    // Bold
+    safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Bullet points
+    safe = safe.replace(/• (.*?)(?=\n|$)/g, '• $1');
+    return safe;
+  }
+
+  /**
+   * Send Query to Study Assistant Endpoint
+   */
+  async function sendAssistantQuery(query) {
+    if (!query || !query.trim()) return;
+
+    appendUserMessage(query.trim());
+    els.inputAssistantQuery.value = '';
+
+    // Temporary loading indicator
+    const loadingRow = document.createElement('div');
+    loadingRow.className = 'chat-message-row assistant-msg';
+    loadingRow.id = 'ast-loading-indicator';
+    loadingRow.innerHTML = `
+      <div class="assistant-avatar-icon">NB</div>
+      <div class="chat-bubble assistant-bubble" style="font-style: italic; color: var(--color-ink-muted);">
+        Analyzing competency benchmarks & generating response...
+      </div>
+    `;
+    els.chatThreadContainer.appendChild(loadingRow);
+    els.chatThreadContainer.scrollTop = els.chatThreadContainer.scrollHeight;
+
+    try {
+      const res = await API.intelligence.askStudyAssistant(query.trim());
+      loadingRow.remove();
+      appendAssistantMessage(res.reply, res.engine);
+    } catch (err) {
+      loadingRow.remove();
+      appendAssistantMessage(`An error occurred while processing your study assistant request: ${err.message}`, 'System Error Handler');
+    }
   }
 
   /**
@@ -822,6 +1262,82 @@
         cont.style.display = 'none';
         els.btnToggleReview.textContent = 'Toggle Answers & Explanations';
       }
+    });
+
+    // Stage 2: Skill Gaps Filters & Actions
+    if (els.gapsDomainFilters) {
+      els.gapsDomainFilters.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-filter');
+        if (!btn) return;
+        const dom = btn.dataset.domain;
+        currentActiveDomainFilter = dom;
+
+        els.gapsDomainFilters.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (currentGapsData && currentGapsData.allCompetencies) {
+          renderSkillGapsList(currentGapsData.allCompetencies, dom);
+        }
+      });
+    }
+
+    if (els.btnGapsToRecommendations) {
+      els.btnGapsToRecommendations.addEventListener('click', () => {
+        switchView('recommendations');
+      });
+    }
+
+    if (els.btnGapsToRoadmap) {
+      els.btnGapsToRoadmap.addEventListener('click', () => {
+        switchView('roadmap');
+      });
+    }
+
+    // Stage 2: Recommendations Actions
+    if (els.btnRecsToRoadmap) {
+      els.btnRecsToRoadmap.addEventListener('click', () => {
+        switchView('roadmap');
+      });
+    }
+
+    if (els.btnRecsToGaps) {
+      els.btnRecsToGaps.addEventListener('click', () => {
+        switchView('skill-gaps');
+      });
+    }
+
+    // Stage 2: Roadmap Actions
+    if (els.btnRoadmapToAssistant) {
+      els.btnRoadmapToAssistant.addEventListener('click', () => {
+        switchView('assistant');
+      });
+    }
+
+    if (els.btnRoadmapToRecs) {
+      els.btnRoadmapToRecs.addEventListener('click', () => {
+        switchView('recommendations');
+      });
+    }
+
+    // Stage 2: Study Assistant Actions
+    if (els.formStudyAssistant) {
+      els.formStudyAssistant.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = els.inputAssistantQuery.value.trim();
+        if (text) {
+          sendAssistantQuery(text);
+        }
+      });
+    }
+
+    // Quick Prompt Chips
+    document.querySelectorAll('.quick-prompt-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const query = chip.dataset.query;
+        if (query) {
+          sendAssistantQuery(query);
+        }
+      });
     });
   }
 
