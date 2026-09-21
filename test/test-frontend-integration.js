@@ -89,12 +89,18 @@ async function runBrowserSimulation() {
     assert.ok(htmlText.includes('view-employee-recommendations'));
     assert.ok(htmlText.includes('view-employee-roadmap'));
     assert.ok(htmlText.includes('view-employee-assistant'));
+    assert.ok(htmlText.includes('view-employee-courses'));
+    assert.ok(htmlText.includes('view-course-detail'));
+    assert.ok(htmlText.includes('view-lesson-detail'));
+    assert.ok(htmlText.includes('view-quiz-detail'));
+    assert.ok(htmlText.includes('view-quiz-result'));
 
     const cssRes = await client.fetch('/styles.css');
     assert.strictEqual(cssRes.status, 200);
     const cssText = await cssRes.text();
     assert.ok(cssText.includes('badge-priority-high'));
     assert.ok(cssText.includes('recommendations-grid'));
+    assert.ok(cssText.includes('curriculum-lessons-list'));
 
     const jsRes = await client.fetch('/employee.js');
     assert.strictEqual(jsRes.status, 200);
@@ -182,7 +188,47 @@ async function runBrowserSimulation() {
     assert.ok(astRes.body.data.reply.length > 20);
     console.log('✓ PASS');
 
-    // 9. Logout
+    // 9. Stage 3 Learning: Course Catalog & Detail Data Flow
+    process.stdout.write('• Testing: GET /api/courses and /api/courses/1 course & curriculum payload... ');
+    const coursesRes = await client.getJson('/api/courses');
+    assert.strictEqual(coursesRes.status, 200);
+    assert.strictEqual(coursesRes.body.success, true);
+    assert.strictEqual(coursesRes.body.data.courses.length, 6);
+
+    const courseDetailRes = await client.getJson('/api/courses/1');
+    assert.strictEqual(courseDetailRes.status, 200);
+    assert.strictEqual(courseDetailRes.body.data.course.code, 'CRS_STAT_101');
+    assert.strictEqual(courseDetailRes.body.data.lessons.length, 3);
+    console.log('✓ PASS');
+
+    // 10. Stage 3 Learning: Lesson Progression & Persistent Completion
+    process.stdout.write('• Testing: POST /api/lessons/:id/complete persistent lesson completion... ');
+    const completeRes = await client.postJson('/api/lessons/1/complete', {});
+    assert.strictEqual(completeRes.status, 200);
+    assert.strictEqual(completeRes.body.success, true);
+    assert.strictEqual(completeRes.body.data.is_completed, true);
+    assert.strictEqual(completeRes.body.data.progress.completed_lessons, 1);
+    assert.strictEqual(completeRes.body.data.progress.progress_percent, 33.3);
+    console.log('✓ PASS');
+
+    // 11. Stage 3 Learning: Knowledge Quiz Taking & Server-Side Scoring
+    process.stdout.write('• Testing: GET /api/quizzes/1 and POST /api/quizzes/1/submit evaluation... ');
+    const quizRes = await client.getJson('/api/quizzes/1');
+    assert.strictEqual(quizRes.status, 200);
+    const quizQList = quizRes.body.data.questions;
+    assert.ok(quizQList.length >= 3);
+
+    const quizAnswers = {};
+    quizQList.forEach(q => { quizAnswers[q.id] = 0; });
+    const quizSubmitRes = await client.postJson('/api/quizzes/1/submit', { answers: quizAnswers });
+    assert.strictEqual(quizSubmitRes.status, 200);
+    assert.strictEqual(quizSubmitRes.body.success, true);
+    assert.strictEqual(quizSubmitRes.body.data.score, 100.0);
+    assert.strictEqual(quizSubmitRes.body.data.passed, true);
+    assert.ok(quizSubmitRes.body.data.question_review.length >= 3);
+    console.log('✓ PASS');
+
+    // 12. Logout
     process.stdout.write('• Testing: Official logout & session invalidation... ');
     const logoutRes = await client.postJson('/api/auth/logout', {});
     assert.strictEqual(logoutRes.status, 200);

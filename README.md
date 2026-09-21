@@ -1,11 +1,11 @@
 # NAVBODH (नवबोध)
 ### Personalized Skill Intelligence & Learning Platform for India's Official Statistical System
 
-> **Stage 2: Intelligence** | Smart India Hackathon 2026  
+> **Stage 3: Learning** | Smart India Hackathon 2026  
 > **Repository:** [pallavsharma-7/NAVBODH](https://github.com/pallavsharma-7/NAVBODH)  
-> **Current Branch:** `rucha-intelligence`  
-> **Predecessor Branch:** `navbodh-core` (Commit `bd4aae1`)  
-> **Contributor (Intelligence):** Rucha  
+> **Current Branch:** `pathika-learning`  
+> **Predecessor Branch:** `rucha-intelligence` (Commit `6d71e0e` / Merged `0d4c404`)  
+> **Contributor (Learning):** Pathika  
 
 ---
 
@@ -17,7 +17,7 @@ The **National Statistical System (NSS)** of India—comprising the Ministry of 
 Statistical officers across diverse divisions (NAD, SDRD, FOD, ESD, DIID, NSSTA) enter with varied competencies. Without structured skill-gap analysis, training assignments are uniform rather than tailored, leading to training inefficiencies and skill mismatches.
 
 ### NAVBODH Solution Architecture
-**NAVBODH** establishes a closed-loop skill intelligence ecosystem:
+**NAVBODH** establishes a closed-loop skill intelligence and learning ecosystem:
 ```
 Employee Profile & Cadre Data (Stage 1: Tanishka - DONE)
       ↓
@@ -31,9 +31,11 @@ Dynamic Phased Learning Roadmap (Stage 2: Rucha - DONE)
       ↓
 Intelligent Study Assistant Boundary (Stage 2: Rucha - DONE)
       ↓
-Interactive Course & Lesson Delivery (Stage 3: Pathika)
+Interactive Course Catalog, Syllabi & Lesson Delivery (Stage 3: Pathika - DONE)
       ↓
-Knowledge Verification Quizzes (Stage 3: Pathika)
+Persistent Learning Progress & Lesson Completion (Stage 3: Pathika - DONE)
+      ↓
+Anti-Cheating Quizzes & Server-Side Scoring Engine (Stage 3: Pathika - DONE)
       ↓
 Growth Calculation & Gamification (Stage 4: Pallav)
       ↓
@@ -45,6 +47,7 @@ Final Hardening & Security Audit (Stage 6: Parth)
 **Key Metric:** *Growth-Based Intelligence*. Individual deficiency gaps and learning progression are continuously derived against permanent baseline scores:
 $$\text{Skill Gap} = \text{Target Score} - \text{Current Score} \quad (\text{if } \text{Gap} > 0)$$
 $$\text{Growth \%} = \frac{\text{Current Score} - \text{Baseline Score}}{\text{Baseline Score}} \times 100$$
+$$\text{Course Progress \%} = \frac{\text{Completed Lessons in Course}}{\text{Total Lessons in Course}} \times 100$$
 
 ---
 
@@ -85,23 +88,54 @@ Stage 2 delivers a deterministic, transparent, and explainable intelligence laye
 
 ---
 
-## 3. Technology Stack
+## 3. Stage 3: Learning Module Architecture
 
-- **Frontend:** HTML5, Vanilla JavaScript (Modular ES6), Vanilla CSS (NAVBODH Design System Token Architecture with Google Font `Audiowide`, paper/ink government theme, block borders, subtle offset shadows, and pixel badges).
-- **Backend:** Node.js (v24.x / v25.x), Express.js (v4.21.x REST API).
-- **Database:** SQLite (Relational engine with dual-mode support: `better-sqlite3` native bindings and zero-dependency `node:sqlite` fallback for full forward compatibility).
-- **Security:** Server-side cryptographic sessions (`crypto.randomBytes`), `HttpOnly` cookies, parameterized SQL queries, strict session-based employee data isolation.
+Stage 3 transforms NAVBODH's foundation and Intelligence recommendations into an interactive, persistent learning and knowledge verification experience for statistical officers:
+
+### 1. Course Catalog & Syllabus Details
+- **Catalog Navigation:** Authenticated employees browse all available courses across statistical, technical, domain, and administrative competencies.
+- **Enriched Metadata:** Exposes duration, difficulty level, attached competencies, lesson count, and live officer completion percentage.
+- **Curriculum Hierarchy:** `GET /api/courses/:id` delivers complete course syllabus, ordered lessons with sequential indexing, attached official learning materials, and associated evaluation quiz.
+
+### 2. Lesson Reader & Official Learning Materials
+- **Structured Content Delivery:** `GET /api/lessons/:id` returns formatted, pedagogical lesson content, estimated read times, and previous/next navigation links.
+- **Official References:** Attached `learning_materials` display official NSSTA and MoSPI documentation, circulars, and study notes with explicit source labels.
+- **Session-Based Isolation:** Lesson completion state is strictly queried per authenticated session (`req.user.id`).
+
+### 3. Persistent SQLite Lesson Completion & Progress Engine
+- **Idempotent Completion:** `POST /api/lessons/:id/complete` records completion into `lesson_completions`. Repeated clicks safely return current state without corrupting or duplicating records.
+- **Deterministic Course Progress:** Automatically derives course progress percentage as $(\text{completed\_lessons} / \text{total\_lessons}) \times 100$.
+- **Database Persistence:** Progress is stored in `learning_progress` in SQLite, surviving page refreshes, logouts, and server restarts.
+- **Strict Baseline Immutability:** Learning progress and lesson completion never modify or recalculate `employee_competencies.baseline_score`.
+
+### 4. Anti-Cheating Knowledge Verification Quizzes
+- **Secure Question Retrieval:** `GET /api/quizzes/:id` delivers quiz questions and option choices while strictly omitting correct option keys and explanations to prevent frontend inspection or cheating.
+- **Server-Side Scoring Engine:** `POST /api/quizzes/:id/submit` calculates scores entirely on the backend from stored questions. Client-supplied scores or correctness flags are never trusted.
+- **Comprehensive Results:** Upon submission, the engine persists attempt history in `quiz_attempts` with full answer-level diagnostics and returns percentage score, pass/fail status (passing threshold: 70%), and detailed question explanations.
+
+### 5. Intelligence $\to$ Learning Integration
+- **Seamless Flow:** Recommended courses in the Intelligence dashboard (`GET /api/intelligence/recommendations`) and roadmap milestones (`GET /api/intelligence/roadmap`) link directly to Course Details via `viewCourseDetail(courseId)`.
+- **Zero Duplication:** Reuses existing course catalog and recommendation mapping without inventing fake or detached course models.
 
 ---
 
-## 4. Directory Structure
+## 4. Technology Stack
+
+- **Frontend:** HTML5, Vanilla JavaScript (Modular ES6), Vanilla CSS (NAVBODH Design System Token Architecture with Google Font `Audiowide`, paper/ink government theme `#F4EFE6` / `#202522`, forest green `#315343`, sage `#738678`, ochre `#B78132`, block borders, subtle offset shadows, and pixel badges).
+- **Backend:** Node.js (v24.x / v26.x), Express.js (v4.21.x REST API).
+- **Database:** SQLite (Relational engine with dual-mode support: `better-sqlite3` native bindings and zero-dependency `node:sqlite` fallback for full forward compatibility).
+- **Security:** Server-side cryptographic sessions (`crypto.randomBytes`), `HttpOnly` cookies, parameterized SQL queries, strict session-based employee data isolation, anti-cheating quiz response masking.
+
+---
+
+## 5. Directory Structure
 
 ```
 NAVBODH/
 ├── package.json               # NPM scripts, test commands, dependencies
 ├── server.js                  # Express server assembly and route mounting
-├── db.js                      # Relational SQLite schema with dual-engine fallback
-├── seed.js                    # Seeder for demo users, competencies, questions & courses
+├── db.js                      # Relational SQLite schema with dual-engine fallback & Stage 3 tables
+├── seed.js                    # Seeder for demo users, competencies, questions, courses, lessons & quizzes
 ├── .gitignore                 # Exclusion rules (node_modules, .env, *.sqlite)
 ├── README.md                  # Comprehensive platform documentation
 │
@@ -111,26 +145,27 @@ NAVBODH/
 ├── routes-auth.js             # Authentication endpoints (/api/auth/login, logout, me)
 ├── routes-core.js             # Core endpoints (/api/health, profile, competencies, assessment)
 ├── routes-intelligence.js     # [Stage 2: Rucha] Skill-gaps, recommendations, roadmap, study-assistant
-├── routes-learning.js         # [Stage 3: Pathika] Safe route boundary for learning modules
+├── routes-learning.js         # [Stage 3: Pathika] Course catalog, lessons, completion & quizzes
 ├── routes-gamification.js     # [Stage 4: Pallav] Safe route boundary for leaderboard & rewards
 ├── routes-admin.js            # [Stage 5: Palak] Core admin boundary & overview metrics
 │
 ├── public/                    # Frontend Single Page Application (SPA)
-│   ├── index.html             # Application shell, navigation, and Stage 2 Intelligence views
-│   ├── styles.css             # NAVBODH design tokens, palettes, and Intelligence UI styles
-│   ├── api.js                 # Reusable HTTP client wrapper with API.intelligence methods
-│   ├── employee.js            # Employee portal controller (Dashboard, Gaps, Recs, Roadmap, Assistant)
+│   ├── index.html             # Application shell, navigation, Intelligence & Stage 3 Learning views
+│   ├── styles.css             # NAVBODH design tokens, palettes, Intelligence & Learning UI styles
+│   ├── api.js                 # Reusable HTTP client wrapper with API.intelligence & API.learning methods
+│   ├── employee.js            # Employee portal controller (Dashboard, Intelligence, Courses, Lessons, Quizzes)
 │   └── admin.js               # Administrator dashboard controller
 │
 └── test/
     ├── test-core.js           # Core Foundation automated test suite (17 test cases)
     ├── test-intelligence.js   # Stage 2 Intelligence automated test suite (10 test cases)
-    └── test-frontend-integration.js # Full-stack client lifecycle simulation (9 test cases)
+    ├── test-learning.js       # Stage 3 Learning automated test suite (13 test cases)
+    └── test-frontend-integration.js # Full-stack client lifecycle simulation (12 test cases)
 ```
 
 ---
 
-## 5. Working API Endpoints
+## 6. Working API Endpoints
 
 ### Core Foundation Endpoints (Stage 1)
 | Method | Endpoint | Auth Required | Role | Purpose |
@@ -148,7 +183,7 @@ NAVBODH/
 | `GET` | `/api/assessment/result` | Yes | Employee | Get latest assessment results & review |
 | `GET` | `/api/admin/overview` | Yes | Admin | System statistics & audit log of assessments |
 
-### Intelligence Engine Endpoints (Stage 2 - Implemented)
+### Intelligence Engine Endpoints (Stage 2)
 | Method | Endpoint | Auth Required | Role | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
 | `GET` | `/api/intelligence/skill-gaps` | Yes | Employee | Deterministic skill-gap identification and prioritization |
@@ -156,95 +191,93 @@ NAVBODH/
 | `GET` | `/api/intelligence/roadmap` | Yes | Employee | Dynamic, phased learning roadmap with milestone progression |
 | `POST` | `/api/intelligence/study-assistant` | Yes | Employee | AI study assistant boundary with grounded deterministic fallback |
 
+### Learning Module Endpoints (Stage 3 - Implemented)
+| Method | Endpoint | Auth Required | Role | Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/api/courses` | Yes | Employee | Course catalog with attached competencies & progress |
+| `GET` | `/api/courses/:id` | Yes | Employee | Full course syllabus, ordered lessons, materials & quiz |
+| `GET` | `/api/courses/:id/lessons` | Yes | Employee | List ordered lessons belonging to course |
+| `GET` | `/api/lessons/:id` | Yes | Employee | Structured lesson reader, materials & navigation |
+| `POST` | `/api/lessons/:id/complete` | Yes | Employee | Mark lesson complete & derive persistent course progress |
+| `GET` | `/api/quizzes` | Yes | Employee | List knowledge verification quizzes with attempt history |
+| `GET` | `/api/quizzes/:id` | Yes | Employee | Fetch quiz questions (correct answers hidden) |
+| `POST` | `/api/quizzes/:id/submit` | Yes | Employee | Server-side scoring, attempt persistence & result review |
+
 ---
 
-## 6. Example Intelligence API Payloads
+## 7. Example Stage 3 API Payloads
 
-### `GET /api/intelligence/skill-gaps`
+### `GET /api/courses/1`
 ```json
 {
   "success": true,
   "data": {
-    "hasAssessment": true,
-    "summary": {
-      "totalCompetencies": 17,
-      "activeGapsCount": 6,
-      "highPriorityCount": 2,
-      "mediumPriorityCount": 3,
-      "lowPriorityCount": 1,
-      "metCount": 11,
-      "averageCurrentScore": 62.4,
-      "averageTargetScore": 80.0,
-      "domainsRepresented": ["Technical", "Statistical"],
-      "largestGap": {
-        "competencyId": 7,
-        "competency": "SQL",
-        "domain": "Technical",
-        "gap": 35.0,
-        "priority": "high"
+    "course": {
+      "id": 1,
+      "code": "CRS_STAT_101",
+      "title": "National Accounts & GDP Compilation Methodology",
+      "description": "Comprehensive training on SUT tables, GVA estimation, and base-year revisions according to SNA 2008 standards.",
+      "durationHours": 18,
+      "difficultyLevel": "intermediate",
+      "source": "sample_nssta_tpac",
+      "sourceDisplayName": "Sample NSSTA Training Calendar (Demo)",
+      "competencies": [
+        { "id": 1, "code": "STAT_SNA", "name": "System of National Accounts (SNA)" }
+      ],
+      "lessonsCount": 3,
+      "completedLessonsCount": 1,
+      "progressPercentage": 33.3,
+      "lessons": [
+        {
+          "id": 1,
+          "title": "Introduction to SNA 2008 & GDP Framework",
+          "orderNum": 1,
+          "durationMinutes": 45,
+          "isCompleted": true,
+          "completedAt": "2026-09-21T15:10:00.000Z",
+          "materialsCount": 2
+        }
+      ],
+      "quiz": {
+        "id": 1,
+        "title": "National Accounts Methodology Assessment Quiz",
+        "questionsCount": 3,
+        "latestAttempt": null
       }
-    },
-    "gaps": [
-      {
-        "competencyId": 7,
-        "competencyCode": "TECH_SQL",
-        "competency": "SQL",
-        "domain": "Technical",
-        "baselineScore": 45.0,
-        "currentScore": 45.0,
-        "targetScore": 80.0,
-        "gap": 35.0,
-        "priority": "high",
-        "status": "deficiency"
-      }
-    ]
+    }
   }
 }
 ```
 
-### `GET /api/intelligence/recommendations`
+### `POST /api/lessons/1/complete`
 ```json
 {
   "success": true,
   "data": {
-    "hasAssessment": true,
-    "totalRecommendations": 3,
-    "recommendations": [
-      {
-        "courseId": 4,
-        "courseCode": "CRS_TECH_102",
-        "title": "SQL for Government Data Analysts",
-        "source": "sample_igot",
-        "sourceDisplayName": "Sample iGOT-Karmayogi Catalog (Demo)",
-        "durationHours": 14.0,
-        "difficultyLevel": "beginner",
-        "domain": "Technical",
-        "rankingScore": 130.0,
-        "matchedCompetencies": [
-          {
-            "competencyId": 7,
-            "code": "TECH_SQL",
-            "name": "SQL",
-            "domain": "Technical",
-            "currentScore": 45.0,
-            "targetScore": 80.0,
-            "gap": 35.0,
-            "priority": "high",
-            "growthImpact": 25.0
-          }
-        ],
-        "reason": "This course directly addresses your high-priority SQL competency gap (35.0 pts below target) with an estimated +25.0 pt growth impact."
-      }
-    ]
+    "lessonId": 1,
+    "courseId": 1,
+    "isCompleted": true,
+    "alreadyCompleted": false,
+    "progress": {
+      "courseId": 1,
+      "completedLessons": 1,
+      "totalLessons": 3,
+      "progressPercentage": 33.3,
+      "status": "in_progress"
+    }
   }
 }
 ```
 
-### `POST /api/intelligence/study-assistant`
+### `POST /api/quizzes/1/submit`
 **Request:**
 ```json
 {
-  "message": "What should I learn first?"
+  "answers": [
+    { "questionId": 1, "selectedOptionIndex": 1 },
+    { "questionId": 2, "selectedOptionIndex": 1 },
+    { "questionId": 3, "selectedOptionIndex": 1 }
+  ]
 }
 ```
 **Response:**
@@ -252,25 +285,32 @@ NAVBODH/
 {
   "success": true,
   "data": {
-    "reply": "Based on your latest competency evaluation in the **National Accounts Division**, your highest-priority focus area is **SQL** (Technical domain).\n\n• **Current Score:** 45 / Target: 80 (Deficiency Gap: 35 pts - HIGH Priority)\n• **Recommended Focus:** Master relational database querying, window functions, and enterprise statistical data extraction.\n\n**Suggested Learning Sequence:**\n1. Review the foundational concepts in SQL.\n2. Enroll in the matching course from your **Recommendations** tab.\n3. Complete practical statistical exercises on administrative data.\n4. Re-evaluate your score through the periodic assessment module.",
-    "category": "priority_focus",
-    "mode": "rules_based_fallback",
-    "engine": "NAVBODH Explainable Intelligence Assistant (Stage 2 Demo)",
-    "contextSummary": {
-      "officerName": "Priya Sharma",
-      "department": "National Accounts Division",
-      "hasAssessment": true,
-      "activeGapsCount": 6,
-      "topPriorityCompetency": "SQL",
-      "topPriorityGap": 35.0
-    }
+    "attemptId": 1,
+    "quizId": 1,
+    "title": "National Accounts Methodology Assessment Quiz",
+    "score": 100,
+    "passed": true,
+    "correctCount": 3,
+    "totalQuestions": 3,
+    "passingScore": 70,
+    "results": [
+      {
+        "questionId": 1,
+        "questionText": "Under SNA 2008, what is the relationship between Gross Value Added (GVA) at basic prices and GDP at market prices?",
+        "options": ["...", "GDP = GVA at basic prices + Product taxes - Product subsidies", "..."],
+        "selectedOptionIndex": 1,
+        "correctOptionIndex": 1,
+        "isCorrect": true,
+        "explanation": "GDP at market prices equals GVA at basic prices plus product taxes less product subsidies."
+      }
+    ]
   }
 }
 ```
 
 ---
 
-## 7. Demo Credentials
+## 8. Demo Credentials
 
 | Username | Password | Role | Name | Department / Cadre |
 | :--- | :--- | :--- | :--- | :--- |
@@ -280,18 +320,25 @@ NAVBODH/
 
 ---
 
-## 8. Installation & Verification
+## 9. Installation & Verification
 
 ### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Run Test Suite (Core Foundation + Intelligence + Simulation)
+### 2. Run Test Suite (Core + Intelligence + Learning + Frontend Integration)
 ```bash
 npm test
 ```
-*Executes all 27 automated tests across `test-core.js` and `test-intelligence.js`.*
+*Executes all 52 automated tests across `test-core.js` (17 tests), `test-intelligence.js` (10 tests), `test-learning.js` (13 tests), and `test-frontend-integration.js` (12 tests).*
+
+Individual test suites can be executed via:
+```bash
+npm run test:core
+npm run test:intelligence
+npm run test:learning
+```
 
 ### 3. Run Application
 ```bash
@@ -301,18 +348,19 @@ Access the application at: **`http://localhost:3000`**
 
 ---
 
-## 9. Known Limitations & Explicit Disclaimers
+## 10. Known Limitations & Explicit Disclaimers
 
-1. **Rule-Based Intelligence vs External AI:** Stage 2 implements transparent, explainable rule-based algorithms for skill-gap calculation, prioritization, recommendation ranking, and dynamic roadmap generation. The study assistant uses an authoritative rule-based contextual engine as a safe fallback when no external AI API key is configured.
-2. **Sample Catalog Source Labels:** Courses marked with `sample_igot`, `sample_nssta_tpac`, and `local_demo` represent sample training fixtures for demonstration and schema scaffolding. There are **no live connections, credentials, or scraping** of external government portals.
-3. **Future Learning Modules:** Interactive lesson viewing, course enrollment progress, and quiz execution are scheduled for Stage 3 (Pathika).
+1. **Course Catalog Demo Labels:** Courses marked with `sample_nssta_tpac`, `sample_igot`, and `local_demo` represent sample training fixtures. There are **no live connections, credentials, or scraping** of external government portals.
+2. **Server-Side Scoring & Integrity:** All quiz scoring is evaluated server-side. Quiz question endpoints never reveal answer keys prior to submission.
+3. **Immutability of Baseline:** Learning progress updates `learning_progress` and `lesson_completions` without modifying initial `employee_competencies.baseline_score`.
+4. **Future Stages:** Gamification, badges, rewards, and leaderboards are scheduled for Stage 4 (Pallav). Admin analytics and heatmaps are scheduled for Stage 5 (Palak).
 
 ---
 
-## 10. Information for Next Contributor (Stage 3: Pathika)
+## 11. Information for Next Contributor (Stage 4: Pallav)
 
-- **Next Stage:** Stage 3 — Learning (`pathika-learning`)
-- **Starting Branch:** Branch off from `rucha-intelligence`
-- **Ownership:** Interactive course enrollment, lesson progression (`learning_progress`, `lessons`, `learning_materials`), quiz taking (`quizzes`, `quiz_attempts`), and post-lesson score advancement.
-- **APIs to Consume:** Consume `GET /api/intelligence/recommendations` and `GET /api/intelligence/roadmap` to link recommended courses directly into the enrollment workflow.
-- **Rule of Immutability:** Preserve `baseline_score` immutability in `employee_competencies` while updating `current_score`.
+- **Next Stage:** Stage 4 — Gamification (`pallav-gamification`)
+- **Starting Branch:** Branch off from `pathika-learning`
+- **Ownership:** Gamification dashboard, badge/reward triggers upon course/quiz completion, streak calculations, reward ledger (`reward_ledger`, `achievement_definitions`, `employee_achievements`), and division leaderboards.
+- **APIs to Consume:** Consume `learning_progress`, `lesson_completions`, and `quiz_attempts` to reward officers upon achieving learning milestones.
+- **Rule of Immutability:** Preserve `baseline_score` immutability in `employee_competencies`.

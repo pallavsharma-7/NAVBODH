@@ -538,25 +538,369 @@ function seedDatabase() {
     }
     console.log('[Seed] Course-competency links created.');
 
-    // 8. Sample Lessons
+    // 8. Sample Lessons (Complete Curriculum for All Courses)
     const insertLesson = db.prepare(`
       INSERT OR IGNORE INTO lessons (course_id, title, sequence_order, content_summary, duration_minutes)
       VALUES (?, ?, ?, ?, ?)
     `);
 
     const lessons = [
-      [courseMap['CRS_STAT_101'], 'Principles of Probability Sampling & Frame Selection', 1, 'Covers sample frame construction and non-sampling errors.', 45],
-      [courseMap['CRS_STAT_101'], 'Stratification & Multi-Stage Cluster Designs', 2, 'Methods for allocating sample units across rural/urban strata.', 60],
-      [courseMap['CRS_STAT_201'], 'Overview of SNA 2008 Sequence of Accounts', 1, 'Production account, generation of income, and primary distribution.', 60],
-      [courseMap['CRS_TECH_101'], 'Python Environment & Data Structures for Statistics', 1, 'Introduction to Python, Jupyter notebooks, and Pandas DataFrames.', 45],
-      [courseMap['CRS_TECH_101'], 'Data Cleaning, Validation & Anomaly Detection', 2, 'Handling missing values, outlier detection, and data export.', 60],
-      [courseMap['CRS_GOV_101'], 'DPDP Act Overview & Government Compliance Requirements', 1, 'Key provisions of DPDP Act for official statistical databases.', 40]
+      // CRS_STAT_101
+      [courseMap['CRS_STAT_101'], 'Principles of Probability Sampling & Frame Selection', 1, 'Covers sample frame construction, auxiliary variables, and non-sampling error mitigation in nationwide official surveys.', 45],
+      [courseMap['CRS_STAT_101'], 'Stratification & Multi-Stage Cluster Designs', 2, 'Methods for allocating sample units across rural/urban strata and designing primary sampling units (PSUs).', 60],
+      [courseMap['CRS_STAT_101'], 'Variance Estimation & Design Effects (Deff)', 3, 'Computational methods for calculating sampling errors, design effects, and post-stratification weighting adjustments.', 45],
+
+      // CRS_STAT_201
+      [courseMap['CRS_STAT_201'], 'Overview of SNA 2008 Sequence of Accounts', 1, 'Production account, generation of income, and primary distribution of income across institutional sectors.', 60],
+      [courseMap['CRS_STAT_201'], 'Gross Value Added (GVA) by Industry & Basic Prices', 2, 'Measuring gross output, intermediate consumption, and economic activity classification at basic prices.', 60],
+      [courseMap['CRS_STAT_201'], 'Supply-Use Tables (SUT) & Input-Output Matrices', 3, 'Balancing supply at purchaser prices with intermediate and final uses for national commodity balance.', 75],
+
+      // CRS_TECH_101
+      [courseMap['CRS_TECH_101'], 'Python Environment & Data Structures for Statistics', 1, 'Setting up reproducible Jupyter workflows, Pandas DataFrames, Series manipulation, and data types.', 45],
+      [courseMap['CRS_TECH_101'], 'Data Cleaning, Validation & Anomaly Detection', 2, 'Handling missing microdata values, outlier detection using IQR/Z-scores, and automated validation rules.', 60],
+      [courseMap['CRS_TECH_101'], 'Automated Pipeline Scripting & Microdata Export', 3, 'Writing automated ETL transformation scripts, batch file processing, and standardized statistical output generation.', 50],
+
+      // CRS_TECH_102
+      [courseMap['CRS_TECH_102'], 'Relational Database Architecture & Query Fundamentals', 1, 'Core relational concepts, SELECT statements, WHERE filtering, and multi-table INNER and LEFT joins.', 40],
+      [courseMap['CRS_TECH_102'], 'Aggregate Functions, Grouping & Having Clauses', 2, 'Computing district-wise summary statistics, multi-column grouping, and filtering aggregated results with HAVING.', 45],
+      [courseMap['CRS_TECH_102'], 'Window Functions, CTEs & Complex Statistical Extractions', 3, 'Mastering OVER/PARTITION BY clauses, DENSE_RANK(), moving averages, and Common Table Expressions.', 60],
+
+      // CRS_GOV_101
+      [courseMap['CRS_GOV_101'], 'DPDP Act Overview & Government Compliance Requirements', 1, 'Key legal provisions of India Digital Personal Data Protection Act for official statistical databases.', 40],
+      [courseMap['CRS_GOV_101'], 'Statistical Anonymization & De-Identification Techniques', 2, 'Applying k-anonymity, l-diversity, pseudonymization, and perturbation before public microdata release.', 45],
+      [courseMap['CRS_GOV_101'], 'Government Information Security Hygiene & Threat Mitigation', 3, 'Cybersecurity best practices, phishing prevention, secure government cloud protocols, and incident reporting.', 35],
+
+      // CRS_MGT_101
+      [courseMap['CRS_MGT_101'], 'Strategic Team Leadership in Large-Scale Field Operations', 1, 'Managing cross-functional enumerator teams, field bottleneck resolution, and operational quality control.', 40],
+      [courseMap['CRS_MGT_101'], 'Translating Statistical Insights for Policy Stakeholders', 2, 'Executive briefing techniques, plain language dissemination, and effective statistical communication.', 45],
+      [courseMap['CRS_MGT_101'], 'Fundamental Principles of Official Statistics & Ethics', 3, 'Upholding scientific independence, professional ethics, impartiality, and public trust in official reporting.', 35]
     ];
 
     for (const l of lessons) {
       insertLesson.run(l[0], l[1], l[2], l[3], l[4]);
     }
-    console.log('[Seed] Sample lessons seeded.');
+    console.log('[Seed] 18 Sample lessons seeded across all 6 courses.');
+
+    // Fetch lesson IDs
+    const lessonRows = db.prepare('SELECT id, course_id, title FROM lessons').all();
+    const lessonMap = {};
+    for (const l of lessonRows) {
+      lessonMap[`${l.course_id}_${l.title}`] = l.id;
+    }
+
+    // 8b. Sample Learning Materials
+    const insertMaterial = db.prepare(`
+      INSERT OR IGNORE INTO learning_materials (lesson_id, title, material_type, file_url_or_ref)
+      VALUES (?, ?, ?, ?)
+    `);
+
+    const materials = [
+      [lessonMap[`${courseMap['CRS_STAT_101']}_Principles of Probability Sampling & Frame Selection`], 'NSSTA Sampling Frame Manual (Vol. 1)', 'reference_manual', 'doc:nssta/manual_sampling_v1.pdf'],
+      [lessonMap[`${courseMap['CRS_STAT_101']}_Principles of Probability Sampling & Frame Selection`], 'Standard Operating Procedure on Frame Validation', 'guideline', 'doc:mospi/sop_frame_validation.pdf'],
+      [lessonMap[`${courseMap['CRS_STAT_101']}_Stratification & Multi-Stage Cluster Designs`], 'Sample PSU Allocation Worksheet', 'dataset', 'data:samples/psu_allocation_template.xlsx'],
+      [lessonMap[`${courseMap['CRS_STAT_201']}_Overview of SNA 2008 Sequence of Accounts`], 'UN SNA 2008 Chapter 6: Production Account Guide', 'document', 'doc:un_sna/sna2008_ch06.pdf'],
+      [lessonMap[`${courseMap['CRS_STAT_201']}_Supply-Use Tables (SUT) & Input-Output Matrices`], 'National Accounts SUT Compilation Framework', 'reference_manual', 'doc:nad/sut_compilation_framework.pdf'],
+      [lessonMap[`${courseMap['CRS_TECH_101']}_Python Environment & Data Structures for Statistics`], 'Official Statistical Python Starter Notebook', 'document', 'nb:statistical_python_starter.ipynb'],
+      [lessonMap[`${courseMap['CRS_TECH_101']}_Data Cleaning, Validation & Anomaly Detection`], 'Sample Household Survey Raw Microdata (10k records)', 'dataset', 'data:surveys/sample_household_raw.csv'],
+      [lessonMap[`${courseMap['CRS_TECH_102']}_Window Functions, CTEs & Complex Statistical Extractions`], 'SQL Statistical Recipes & Analytical Patterns Guide', 'reference_manual', 'doc:tech/sql_statistical_patterns.pdf'],
+      [lessonMap[`${courseMap['CRS_GOV_101']}_Statistical Anonymization & De-Identification Techniques`], 'MoSPI Data Anonymization Guidelines & Checklist', 'guideline', 'doc:governance/anonymization_guidelines.pdf'],
+      [lessonMap[`${courseMap['CRS_MGT_101']}_Fundamental Principles of Official Statistics & Ethics`], 'UN Fundamental Principles of Official Statistics Charter', 'document', 'doc:un/fundamental_principles_statistics.pdf']
+    ];
+
+    for (const m of materials) {
+      if (m[0]) {
+        insertMaterial.run(m[0], m[1], m[2], m[3]);
+      }
+    }
+    console.log('[Seed] Sample learning materials seeded.');
+
+    // 8c. Sample Knowledge Verification Quizzes (1 per course)
+    const insertQuiz = db.prepare(`
+      INSERT OR IGNORE INTO quizzes (course_id, competency_id, title, description, pass_percentage)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    const quizzes = [
+      [courseMap['CRS_STAT_101'], compMap['STAT_SAMPLING'], 'Survey Sampling & Estimation Techniques Mastery Quiz', 'Assess your knowledge in sampling frame selection, multi-stage stratification, and variance calculation.', 75.0],
+      [courseMap['CRS_STAT_201'], compMap['STAT_NAT_ACCOUNTS'], 'National Accounts & GDP Compilation Verification Quiz', 'Evaluate your understanding of SNA 2008 sequences, GVA compilation, and Supply-Use Table commodity balances.', 70.0],
+      [courseMap['CRS_TECH_101'], compMap['TECH_PYTHON'], 'Python & Pandas Statistical Workflows Quiz', 'Demonstrate proficiency in Pandas DataFrame filtering, data cleaning pipelines, and automated aggregations.', 75.0],
+      [courseMap['CRS_TECH_102'], compMap['TECH_SQL'], 'Government SQL Data Extraction & Analytics Quiz', 'Verify SQL query optimization, aggregate grouping, and advanced analytical window functions.', 70.0],
+      [courseMap['CRS_GOV_101'], compMap['GOV_DATA_PRIVACY'], 'Data Privacy, Security & Governance Compliance Quiz', 'Check comprehension of DPDP Act obligations, microdata anonymization, and cyber security hygiene.', 75.0],
+      [courseMap['CRS_MGT_101'], compMap['BEH_LEADERSHIP'], 'Project Leadership & Statistical Ethics Quiz', 'Test your skills in public sector statistical leadership, stakeholder communication, and scientific integrity.', 70.0]
+    ];
+
+    for (const q of quizzes) {
+      insertQuiz.run(q[0], q[1], q[2], q[3], q[4]);
+    }
+    console.log('[Seed] 6 Knowledge quizzes seeded.');
+
+    // Fetch quiz IDs
+    const quizRows = db.prepare('SELECT id, course_id FROM quizzes').all();
+    const quizMap = {};
+    for (const q of quizRows) {
+      quizMap[q.course_id] = q.id;
+    }
+
+    // 8d. Quiz Questions (3-4 questions per quiz)
+    const insertQuizQuestion = db.prepare(`
+      INSERT OR IGNORE INTO quiz_questions (quiz_id, question_text, options_json, correct_option_index, explanation, sequence_order)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+
+    const quizQuestions = [
+      // QZ_STAT_101
+      [
+        quizMap[courseMap['CRS_STAT_101']],
+        'When conducting multi-stage cluster sampling, what is the primary purpose of calculating design effects (Deff)?',
+        JSON.stringify([
+          'To assess variance inflation under complex clustering relative to simple random sampling (SRSWOR)',
+          'To completely eliminate the requirement for primary sampling units (PSUs)',
+          'To artificially reduce the required field sample size without budgetary review',
+          'To replace collected survey records with synthetic census predictions'
+        ]),
+        0,
+        'The Design Effect (Deff) quantifies the ratio of sample variance under a complex cluster design relative to an equal-sized simple random sample.',
+        1
+      ],
+      [
+        quizMap[courseMap['CRS_STAT_101']],
+        'In stratified random sampling, which sample allocation strategy minimizes overall estimation variance for a fixed total budget when stratum standard deviations differ?',
+        JSON.stringify([
+          'Neyman / Optimum Allocation (allocating sample size proportional to stratum size and variance)',
+          'Equal Sample Allocation across all strata regardless of size',
+          'Arbitrary unweighted allocation based on field enumerator preference',
+          'Uniform systematic cluster sampling'
+        ]),
+        0,
+        'Neyman optimum allocation distributes sample units proportional to stratum size and stratum standard deviation, minimizing overall survey variance.',
+        2
+      ],
+      [
+        quizMap[courseMap['CRS_STAT_101']],
+        'What is the finite population correction (FPC) factor used when calculating sample variance in SRSWOR from a finite population of size N?',
+        JSON.stringify([
+          '(1 - n / N)',
+          '(1 + n / N)',
+          '(N / n)^2',
+          '(n - 1) / N'
+        ]),
+        0,
+        'The finite population correction factor (1 - f) where f = n/N accounts for sampling without replacement from a finite population.',
+        3
+      ],
+
+      // QZ_STAT_201
+      [
+        quizMap[courseMap['CRS_STAT_201']],
+        'In the System of National Accounts (SNA 2008), how is Gross Value Added (GVA) at basic prices computed from output and inputs?',
+        JSON.stringify([
+          'Gross Output at basic prices minus Intermediate Consumption',
+          'Total Household Final Consumption Expenditure plus Imports',
+          'Gross Domestic Product at market prices plus Total Product Subsidies',
+          'Net Operating Surplus minus Compensation of Employees'
+        ]),
+        0,
+        'GVA at basic prices is defined as Gross Output valued at basic prices less Intermediate Consumption valued at purchasers prices.',
+        1
+      ],
+      [
+        quizMap[courseMap['CRS_STAT_201']],
+        'Which fundamental macroeconomic balancing identity must hold true within the Supply-Use Tables (SUT) framework for each commodity group?',
+        JSON.stringify([
+          'Total Supply at purchasers prices equals Total Use (Intermediate + Final + Exports) at purchasers prices',
+          'Total Domestic Output must equal Total Foreign Imports in every sector',
+          'Gross Fixed Capital Formation must equal Zero in services industries',
+          'Government Final Consumption must equal Total Indirect Taxes'
+        ]),
+        0,
+        'The fundamental commodity balance in SUT requires total supply at purchasers prices to equal total uses at purchasers prices.',
+        2
+      ],
+      [
+        quizMap[courseMap['CRS_STAT_201']],
+        'Under the SNA production boundary, which institutional sector includes market producers primarily engaged in producing financial intermediation services?',
+        JSON.stringify([
+          'Financial Corporations Sector (S.12)',
+          'General Government Sector (S.13)',
+          'Non-Financial Corporations Sector (S.11)',
+          'Non-Profit Institutions Serving Households (S.15)'
+        ]),
+        0,
+        'Sector S.12 encompasses resident financial corporations providing banking, insurance, and financial intermediary services.',
+        3
+      ],
+
+      // QZ_TECH_101
+      [
+        quizMap[courseMap['CRS_TECH_101']],
+        'In Python Pandas, which method is the most reliable and idiomatic way to count missing (NaN/None) values per column in a survey microdata DataFrame?',
+        JSON.stringify([
+          'df.isna().sum()',
+          'df.dropna().count()',
+          'df.find_nulls().total()',
+          'df.replace_empty().length()'
+        ]),
+        0,
+        'df.isna().sum() creates a boolean mask of missing values and sums True values per column.',
+        1
+      ],
+      [
+        quizMap[courseMap['CRS_TECH_101']],
+        'When combining a household survey dataset with a district administrative master table on matching State_Code and District_Code, which Pandas function is best suited?',
+        JSON.stringify([
+          'pd.merge(df_households, df_districts, on=["State_Code", "District_Code"], how="left")',
+          'pd.concat([df_households, df_districts], axis=1)',
+          'df_households.append(df_districts)',
+          'df_households.combine_rows(df_districts)'
+        ]),
+        0,
+        'pd.merge() with key columns and how="left" joins tabular records based on relational key fields.',
+        2
+      ],
+      [
+        quizMap[courseMap['CRS_TECH_101']],
+        'To apply a high-performance conditional transformation across an entire DataFrame column without slow Python for-loops, which approach is recommended?',
+        JSON.stringify([
+          'numpy.where(condition, value_if_true, value_if_false)',
+          'for index, row in df.iterrows(): process(row)',
+          'while loop incrementing integer index',
+          'converting the entire column to Python list and iterating'
+        ]),
+        0,
+        'numpy.where() provides vectorized C-level execution for conditional assignments over NumPy arrays and Pandas Series.',
+        3
+      ],
+
+      // QZ_TECH_102
+      [
+        quizMap[courseMap['CRS_TECH_102']],
+        'Which SQL window function assigns consecutive integer ranks to survey rows within partitioned groups without skipping ranking numbers when ties occur?',
+        JSON.stringify([
+          'DENSE_RANK() OVER (PARTITION BY state_id ORDER BY score DESC)',
+          'RANK() OVER (ORDER BY score DESC)',
+          'ROW_NUMBER() OVER (ORDER BY state_id ASC)',
+          'PERCENT_RANK() OVER ()'
+        ]),
+        0,
+        'DENSE_RANK() generates contiguous rank numbers without gaps when multiple rows share identical ordering values.',
+        1
+      ],
+      [
+        quizMap[courseMap['CRS_TECH_102']],
+        'What is the primary architectural purpose of using Common Table Expressions (WITH clause CTEs) in complex statistical SQL scripts?',
+        JSON.stringify([
+          'Structuring multi-step data pipelines into readable, maintainable, modular temporary result sets',
+          'Permanently creating physical hard drive table partitions',
+          'Disabling transactional ACID guarantees for faster writes',
+          'Encrypting SQL query strings in audit logs'
+        ]),
+        0,
+        'CTEs break down complex nested queries into intuitive, sequential, and testable modular building blocks.',
+        2
+      ],
+      [
+        quizMap[courseMap['CRS_TECH_102']],
+        'Which SQL clause is required to filter aggregated group statistics (such as showing only districts where average household income exceeds 50,000)?',
+        JSON.stringify([
+          'HAVING AVG(household_income) > 50000',
+          'WHERE AVG(household_income) > 50000',
+          'GROUP FILTER (AVG > 50000)',
+          'ORDER BY AVG(household_income) FILTER'
+        ]),
+        0,
+        'The HAVING clause filters grouped summary records generated by GROUP BY aggregate calculations.',
+        3
+      ],
+
+      // QZ_GOV_101
+      [
+        quizMap[courseMap['CRS_GOV_101']],
+        'Under statistical k-anonymity principles, a public microdata release satisfies k-anonymity if and only if:',
+        JSON.stringify([
+          'Each combination of quasi-identifying attributes is shared by at least k distinct respondent records',
+          'Exactly k records are randomly deleted from the raw dataset',
+          'The microdata file is protected with a k-character cryptographic password',
+          'The dataset is shared exclusively with k approved government researchers'
+        ]),
+        0,
+        'k-anonymity ensures that quasi-identifiers cannot single out any individual respondent from a group of at least k individuals.',
+        1
+      ],
+      [
+        quizMap[courseMap['CRS_GOV_101']],
+        'Under India Digital Personal Data Protection (DPDP) Act compliance, what is required before disseminating statistical microdata to public repositories?',
+        JSON.stringify([
+          'Rigorous de-identification and anonymization to prevent re-identification of individual data principals',
+          'Retaining direct respondent contact numbers for phone verification by researchers',
+          'Commercial monetization of raw respondent survey responses',
+          'Waiving all government data protection audits'
+        ]),
+        0,
+        'Statistical authorities are legally obligated to anonymize microdata to safeguard respondent confidentiality.',
+        2
+      ],
+      [
+        quizMap[courseMap['CRS_GOV_101']],
+        'What is the standard cybersecurity protocol when an official receives an unsolicited email containing an unexpected executable attachment (.exe)?',
+        JSON.stringify([
+          'Do not open the file; immediately report the suspected phishing attempt to the departmental CISO / IT security team',
+          'Execute the file immediately to verify its statistical contents',
+          'Forward the attachment to all wing colleagues for second opinions',
+          'Rename the file extension to .csv and upload to the database server'
+        ]),
+        0,
+        'Suspicious attachments must never be executed and should be reported to security officers to prevent malware infiltration.',
+        3
+      ],
+
+      // QZ_MGT_101
+      [
+        quizMap[courseMap['CRS_MGT_101']],
+        'When presenting major statistical revisions (such as rebasing of CPI or GDP indices) to policy stakeholders and media, what is the best practice?',
+        JSON.stringify([
+          'Publish transparent methodological notes, clear bridging comparisons, and plain-language executive summaries',
+          'Conceal previous base year figures to avoid questions',
+          'Refuse to answer public methodology queries',
+          'Attribute statistical changes solely to field enumerator errors'
+        ]),
+        0,
+        'Impartial transparency and clear methodological explanations maintain public and stakeholder trust in official statistics.',
+        1
+      ],
+      [
+        quizMap[courseMap['CRS_MGT_101']],
+        'Under the UN Fundamental Principles of Official Statistics, Principle 1 highlights that:',
+        JSON.stringify([
+          'Official statistics constitute an indispensable element in the information system of a democratic society, provided on an impartial basis',
+          'Statistical datasets should be sold exclusively to private commercial bidders',
+          'Government statistical methodology must be kept confidential from the general public',
+          'Statistical figures may be adjusted to meet political targets without audit'
+        ]),
+        0,
+        'Principle 1 affirms the fundamental role of impartial, high-quality, publicly accessible official statistics in democratic governance.',
+        2
+      ],
+      [
+        quizMap[courseMap['CRS_MGT_101']],
+        'During nationwide statistical field operations, which management practice most effectively minimizes non-sampling error?',
+        JSON.stringify([
+          'Concurrent supervisory field inspections, standardized validation protocols, and real-time feedback loops',
+          'Completely eliminating field supervision to accelerate delivery timelines',
+          'Discarding questionnaires that contain minor handwriting differences',
+          'Allowing enumerators to substitute sample households without logging documentation'
+        ]),
+        0,
+        'Active supervision and structured validation loops during field collection identify and correct non-sampling errors early.',
+        3
+      ]
+    ];
+
+    for (const q of quizQuestions) {
+      if (q[0]) {
+        insertQuizQuestion.run(q[0], q[1], q[2], q[3], q[4], q[5]);
+      }
+    }
+    console.log('[Seed] 18 Quiz questions seeded across 6 quizzes.');
 
     // 9. Achievement Definitions (for Pallav / Gamification foundation)
     const insertAch = db.prepare(`
