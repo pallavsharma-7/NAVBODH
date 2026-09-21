@@ -870,6 +870,345 @@ textarea.form-control {
   gap: var(--space-md);
 }
 
+/* --------------------------------------------------------------------------
+   15. STAGE 2: INTELLIGENCE UI STYLES (Skill Gaps, Recommendations, Roadmap, Assistant)
+   -------------------------------------------------------------------------- */
+.filter-tabs-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.btn-filter {
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  border: 1px solid var(--color-ink);
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.btn-filter.active {
+  background-color: var(--color-forest);
+  color: var(--color-paper-light);
+  border-color: var(--color-forest-dark);
+}
+
+/* Priority Badges */
+.badge-priority-high {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  padding: 2px 8px;
+  letter-spacing: 0.5px;
+}
+
+.badge-priority-medium {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background-color: var(--color-ochre-light);
+  color: var(--color-ochre);
+  border: 1px solid var(--color-ochre);
+  padding: 2px 8px;
+  letter-spacing: 0.5px;
+}
+
+.badge-priority-low {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background-color: var(--color-muted-teal-light);
+  color: var(--color-muted-teal);
+  border: 1px solid var(--color-muted-teal);
+  padding: 2px 8px;
+  letter-spacing: 0.5px;
+}
+
+.badge-priority-met {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background-color: var(--color-forest-light);
+  color: var(--color-forest);
+  border: 1px solid var(--color-forest);
+  padding: 2px 8px;
+  letter-spacing: 0.5px;
+}
+
+.badge-source {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background-color: var(--color-paper-light);
+  color: var(--color-ink-light);
+  border: 1px solid var(--color-border);
+  padding: 2px 6px;
+}
+
+/* Skill Gaps Cards & Rows */
+.gap-delta-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.gap-delta-negative {
+  color: var(--color-danger);
+}
+
+.gap-delta-positive {
+  color: var(--color-success);
+}
+
+/* Recommendations Grid & Cards */
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.recommendation-card {
+  background-color: var(--color-surface);
+  border: var(--border-block);
+  box-shadow: var(--shadow-block-sm);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.recommendation-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-block-md);
+}
+
+.matched-comp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-paper-light);
+  border: 1px solid var(--color-border);
+  padding: 3px 8px;
+  font-size: 0.78rem;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.reason-box {
+  background-color: var(--color-forest-light);
+  border-left: 4px solid var(--color-forest);
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: var(--color-forest-dark);
+  margin: var(--space-sm) 0;
+  line-height: 1.45;
+}
+
+/* Roadmap Styles */
+.roadmap-phase-container {
+  margin-bottom: var(--space-xl);
+  border: var(--border-block);
+  box-shadow: var(--shadow-block-md);
+  background-color: var(--color-surface);
+}
+
+.roadmap-phase-header {
+  padding: var(--space-md);
+  background-color: var(--color-paper-light);
+  border-bottom: var(--border-block);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.roadmap-milestones-list {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.roadmap-milestone-item {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-soft);
+  padding: var(--space-md);
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+.milestone-order-circle {
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-forest);
+  color: var(--color-paper-light);
+  font-family: var(--font-brand);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--color-ink);
+}
+
+.milestone-details {
+  flex: 1;
+}
+
+.milestone-courses-list {
+  margin-top: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.milestone-course-chip {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Assistant Chat Styles */
+.assistant-grounding-banner {
+  background-color: var(--color-paper-light);
+  border: var(--border-block);
+  box-shadow: var(--shadow-block-sm);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  font-size: 0.84rem;
+}
+
+.chat-thread-container {
+  min-height: 320px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: var(--space-md);
+  background-color: var(--color-paper-light);
+  border: var(--border-block);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.chat-message-row {
+  display: flex;
+  gap: var(--space-sm);
+  max-width: 85%;
+}
+
+.chat-message-row.user-msg {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-message-row.assistant-msg {
+  align-self: flex-start;
+}
+
+.chat-bubble {
+  padding: 12px 16px;
+  border: var(--border-block);
+  box-shadow: var(--shadow-block-sm);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.chat-bubble.user-bubble {
+  background-color: var(--color-forest-light);
+  color: var(--color-forest-dark);
+  border-color: var(--color-forest-dark);
+}
+
+.chat-bubble.assistant-bubble {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.assistant-avatar-icon {
+  width: 34px;
+  height: 34px;
+  background-color: var(--color-forest);
+  color: var(--color-paper-light);
+  font-family: var(--font-brand);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-block);
+  flex-shrink: 0;
+}
+
+.quick-prompts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.quick-prompt-chip {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-ink);
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  color: var(--color-ink);
+}
+
+.quick-prompt-chip:hover {
+  background-color: var(--color-paper-dark);
+}
+
+.empty-state-card {
+  text-align: center;
+  padding: var(--space-xl) var(--space-lg);
+  background-color: var(--color-surface-soft);
+  border: var(--border-subtle);
+}
+
+.empty-state-title {
+  font-size: 1.15rem;
+  color: var(--color-ink-light);
+  margin-bottom: var(--space-xs);
+}
+
+.empty-state-desc {
+  font-size: 0.88rem;
+  color: var(--color-ink-muted);
+  max-width: 520px;
+  margin: 0 auto var(--space-md) auto;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header-inner {
@@ -886,5 +1225,11 @@ textarea.form-control {
   }
   .competencies-grid {
     grid-template-columns: 1fr;
+  }
+  .recommendations-grid {
+    grid-template-columns: 1fr;
+  }
+  .chat-message-row {
+    max-width: 100%;
   }
 }

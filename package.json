@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "seed": "node seed.js",
-    "test": "node test/test-core.js",
+    "test": "node test/test-core.js && node test/test-intelligence.js && node test/test-frontend-integration.js",
+    "test:core": "node test/test-core.js",
+    "test:intelligence": "node test/test-intelligence.js",
+    "test:frontend": "node test/test-frontend-integration.js",
     "dev": "node server.js"
   },
   "repository": {

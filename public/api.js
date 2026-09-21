@@ -146,6 +146,22 @@
       return API.get('/api/assessment/result');
     },
 
+    // Intelligence Shortcuts (Stage 2: Owner Rucha)
+    intelligence: {
+      getSkillGaps() {
+        return API.get('/api/intelligence/skill-gaps');
+      },
+      getRecommendations() {
+        return API.get('/api/intelligence/recommendations');
+      },
+      getRoadmap() {
+        return API.get('/api/intelligence/roadmap');
+      },
+      askStudyAssistant(message) {
+        return API.post('/api/intelligence/study-assistant', { message });
+      }
+    },
+
     // Admin Shortcuts
     admin: {
       getOverview() {

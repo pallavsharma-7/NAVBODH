@@ -459,27 +459,29 @@ async function runTests() {
         body: { identifier: 'emp.sharma', password: 'Password123!' }
       });
 
-      // Intelligence (Rucha)
+      // Intelligence (Stage 2 - Implemented by Rucha)
       const intelRes = await client.request('/api/intelligence/skill-gaps');
-      assert.strictEqual(intelRes.status, 501);
-      assert.strictEqual(intelRes.body.error.code, 'MODULE_UNDER_DEVELOPMENT');
+      assert.strictEqual(intelRes.status, 200);
+      assert.strictEqual(intelRes.body.success, true);
 
-      // Learning (Pathika)
+      // Learning (Stage 3 - Future Placeholder for Pathika)
       const learnRes = await client.request('/api/learning/courses');
       assert.strictEqual(learnRes.status, 200); // course listing foundation exists
       const enrollRes = await client.request('/api/learning/courses/1/enroll', { method: 'POST' });
       assert.strictEqual(enrollRes.status, 501);
+      assert.strictEqual(enrollRes.body.error.code, 'MODULE_UNDER_DEVELOPMENT');
 
-      // Gamification (Pallav)
+      // Gamification (Stage 4 - Future Placeholder for Pallav)
       const gamRes = await client.request('/api/gamification/leaderboard');
       assert.strictEqual(gamRes.status, 501);
+      assert.strictEqual(gamRes.body.error.code, 'MODULE_UNDER_DEVELOPMENT');
     });
 
     // ------------------------------------------------------------------------
     // TEST 17: SQLite Data Persistence Across Process/Connection Restart
     // ------------------------------------------------------------------------
     await test('SQLite data persists intact when database connection is re-opened', async () => {
-      const Database = require('better-sqlite3');
+      const { Database } = require('../db');
       const freshDb = new Database(TEST_DB_PATH);
       
       const user = freshDb.prepare('SELECT id, username, full_name, phone FROM users WHERE username = ?').get('emp.sharma');
