@@ -1,0 +1,33 @@
+{
+  "name": "navbodh",
+  "version": "1.0.0",
+  "description": "NAVBODH - Skill Intelligence & Learning Platform for India's Official Statistical System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js",
+    "test": "node test/test-core.js",
+    "dev": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pallavsharma-7/NAVBODH.git"
+  },
+  "keywords": [
+    "navbodh",
+    "statistics",
+    "skill-intelligence",
+    "learning-platform",
+    "mospi",
+    "competency-framework"
+  ],
+  "author": "NAVBODH Team",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.8.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2"
+  }
+}

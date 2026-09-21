@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAVBODH — Skill Intelligence & Learning Platform</title>
+  <meta name="description" content="Personalized Skill Intelligence and Learning Platform for Officials in India's Official Statistical System">
+  
+  <!-- Google Fonts: Audiowide for Brand/Headings -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+  
+  <!-- NAVBODH Design System CSS -->
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <!-- Top Government Banner -->
+  <aside class="gov-banner" aria-label="Official platform banner">
+    <div class="gov-banner-left">
+      <span class="gov-banner-tag">OFFICIAL PLATFORM</span>
+      <span>Ministry of Statistics and Programme Implementation (MoSPI) • NSSTA Training System</span>
+    </div>
+    <div class="gov-banner-right">
+      <span id="system-status-indicator">● System Online (v1.0-Core)</span>
+    </div>
+  </aside>
+
+  <!-- Main Application Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="#" class="brand-container" id="brand-link" aria-label="NAVBODH Home">
+        <div class="brand-logo-mark">NB</div>
+        <div class="brand-title-wrap">
+          <span class="brand-title">NAVBODH</span>
+          <span class="brand-subtitle">Skill Intelligence & Learning Platform</span>
+        </div>
+      </a>
+
+      <!-- Authenticated Header Controls (Hidden when logged out) -->
+      <div class="header-actions" id="header-auth-controls" style="display: none;">
+        <div class="user-profile-pill" id="header-user-pill">
+          <span id="header-user-name" style="font-weight: 700;">Employee</span>
+          <span id="header-user-role" class="user-role-badge role-employee">EMPLOYEE</span>
+        </div>
+        <button id="btn-logout" class="btn btn-secondary btn-sm" aria-label="Sign out">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Primary Navigation Bar (Rendered when authenticated) -->
+  <nav class="nav-bar" id="app-nav-bar" style="display: none;" aria-label="Primary Navigation">
+    <div class="nav-bar-inner" id="nav-tabs-container">
+      <!-- Injected dynamically based on role -->
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="main-content" id="main-view-container">
+
+    <!-- ====================================================================
+         VIEW: LOGIN SCREEN
+         ==================================================================== -->
+    <section id="view-login" class="block-card block-card-accent" style="max-width: 540px; margin: var(--space-xl) auto;">
+      <div class="block-card-header">
+        <div class="block-card-title">
+          <h2>OFFICIAL LOGIN</h2>
+        </div>
+        <span class="badge-pixel text-forest">AUTHENTICATION</span>
+      </div>
+
+      <p class="text-muted" style="margin-bottom: var(--space-md); font-size: 0.88rem;">
+        Sign in with your official statistical officer identifier or administrator credentials.
+      </p>
+
+      <form id="form-login">
+        <div class="form-group">
+          <label for="input-identifier" class="form-label">Username or Email</label>
+          <input type="text" id="input-identifier" class="form-control" placeholder="e.g. emp.sharma or email" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="input-password" class="form-label">Password</label>
+          <input type="password" id="input-password" class="form-control" placeholder="••••••••••••" required autocomplete="current-password">
+        </div>
+
+        <div style="margin-top: var(--space-lg);">
+          <button type="submit" id="btn-submit-login" class="btn btn-primary btn-lg" style="width: 100%;">
+            SIGN IN TO NAVBODH
+          </button>
+        </div>
+      </form>
+
+      <!-- Quick Demo Account Switcher (For Pair-Reviewers & Evaluators) -->
+      <div class="demo-accounts-box">
+        <div style="font-size: 0.82rem; font-weight: 700; color: var(--color-ink-muted);">
+          QUICK DEMO CREDENTIALS (CLICK TO AUTO-FILL):
+        </div>
+        <div class="demo-account-btn-group">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-fill-emp1">
+            👤 Priya Sharma (Employee 1)
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-fill-emp2">
+            👤 Rajesh Verma (Employee 2)
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-fill-admin">
+            🛡️ Dr. Anil Kumar (Admin)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: EMPLOYEE DASHBOARD
+         ==================================================================== -->
+    <section id="view-employee-dashboard" style="display: none;">
+      <!-- Welcome Header Banner -->
+      <div class="block-card block-card-accent" style="margin-bottom: var(--space-lg);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <h1 id="dash-greeting">Welcome, Officer</h1>
+            <p id="dash-subtext" class="text-muted" style="margin-top: var(--space-2xs);">
+              Official Statistical Cadre • National Accounts Division
+            </p>
+          </div>
+          <div id="dash-baseline-banner-badge">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Metrics Grid -->
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="stat-tile-label">Baseline Status</div>
+          <div class="stat-tile-value" id="stat-baseline-status">--</div>
+          <div class="stat-tile-desc" id="stat-baseline-desc">Evaluating proficiency baseline</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Assessed Competencies</div>
+          <div class="stat-tile-value" id="stat-comp-count">0 / 17</div>
+          <div class="stat-tile-desc">Across 4 official domains</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Avg Baseline Score</div>
+          <div class="stat-tile-value" id="stat-avg-baseline">--</div>
+          <div class="stat-tile-desc">Initial permanent baseline</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Avg Current Score</div>
+          <div class="stat-tile-value" id="stat-avg-current">--</div>
+          <div class="stat-tile-desc">Live competency benchmark</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Growth Velocity</div>
+          <div class="stat-tile-value" id="stat-growth-pct">0.0%</div>
+          <div class="stat-tile-desc">((Current - Baseline) / Baseline) × 100</div>
+        </div>
+      </div>
+
+      <!-- Quick Action Card -->
+      <div class="block-card block-card-ochre" id="dash-action-card">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2 id="dash-action-title">Initial Competency Assessment</h2>
+          </div>
+          <span class="badge-pixel text-ochre">CORE ACTION</span>
+        </div>
+        <p id="dash-action-desc" style="margin-bottom: var(--space-md);">
+          Complete your comprehensive 17-question baseline assessment to evaluate your skills across Statistical, Technical, Digital Governance, and Managerial domains.
+        </p>
+        <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+          <button id="btn-dash-take-assessment" class="btn btn-primary btn-lg">
+            TAKE ASSESSMENT NOW →
+          </button>
+          <button id="btn-dash-view-profile" class="btn btn-secondary">
+            View & Update Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Competency Summary Grid -->
+      <div class="block-card">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>YOUR COMPETENCY MATRIX</h2>
+          </div>
+          <button id="btn-dash-view-full-result" class="btn btn-secondary btn-sm" style="display: none;">
+            View Detailed Results →
+          </button>
+        </div>
+        <div id="dash-competencies-container">
+          <!-- Competencies cards injected here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: EMPLOYEE PROFILE
+         ==================================================================== -->
+    <section id="view-employee-profile" style="display: none;">
+      <div class="block-card block-card-accent" style="max-width: 800px; margin: 0 auto;">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>OFFICIAL EMPLOYEE PROFILE</h2>
+          </div>
+          <span class="badge-pixel text-forest">IDENTITY RECORD</span>
+        </div>
+
+        <form id="form-profile-edit">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+            <div class="form-group">
+              <label for="prof-username" class="form-label">Username (Read-Only)</label>
+              <input type="text" id="prof-username" class="form-control" readonly disabled>
+            </div>
+            <div class="form-group">
+              <label for="prof-email" class="form-label">Email Address (Read-Only)</label>
+              <input type="email" id="prof-email" class="form-control" readonly disabled>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+            <div class="form-group">
+              <label for="prof-fullname" class="form-label">Full Name *</label>
+              <input type="text" id="prof-fullname" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="prof-designation" class="form-label">Official Designation</label>
+              <input type="text" id="prof-designation" class="form-control" placeholder="e.g. Statistical Officer">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+            <div class="form-group">
+              <label for="prof-department" class="form-label">Department / Division</label>
+              <select id="prof-department" class="form-control">
+                <!-- Injected dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="prof-cadre" class="form-label">Cadre / Service</label>
+              <input type="text" id="prof-cadre" class="form-control" placeholder="e.g. Subordinate Statistical Service (SSS)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prof-phone" class="form-label">Official Contact Number</label>
+            <input type="text" id="prof-phone" class="form-control" placeholder="+91-98110-00000">
+          </div>
+
+          <div class="form-group">
+            <label for="prof-bio" class="form-label">Professional Background & Domain Specialization</label>
+            <textarea id="prof-bio" class="form-control" rows="3" placeholder="Describe your statistical operational experience..."></textarea>
+          </div>
+
+          <div style="margin-top: var(--space-lg); display: flex; gap: var(--space-sm);">
+            <button type="submit" id="btn-save-profile" class="btn btn-primary">
+              Save Profile Changes
+            </button>
+            <button type="button" id="btn-cancel-profile" class="btn btn-secondary">
+              Back to Dashboard
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: EMPLOYEE ASSESSMENT (TAKING ASSESSMENT)
+         ==================================================================== -->
+    <section id="view-employee-assessment" style="display: none; max-width: 900px; margin: 0 auto;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2 id="assess-title">Initial Competency Baseline Assessment</h2>
+          </div>
+          <span class="badge-pixel text-forest" id="assess-status-badge">ASSESSMENT ACTIVE</span>
+        </div>
+
+        <p id="assess-description" class="text-muted" style="margin-bottom: var(--space-md);">
+          Answer all questions across the 4 competency domains. The first completed submission establishes your permanent baseline for growth measurement.
+        </p>
+
+        <!-- Assessment Progress Bar -->
+        <div style="margin-bottom: var(--space-lg);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+            <span>PROGRESS</span>
+            <span id="assess-progress-text">0 / 17 Questions Answered</span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="assess-progress-bar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Questions Form -->
+        <form id="form-assessment">
+          <div id="questions-list-container">
+            <!-- Questions rendered here -->
+          </div>
+
+          <div style="margin-top: var(--space-xl); padding-top: var(--space-md); border-top: var(--border-block); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-md);">
+            <button type="button" id="btn-cancel-assessment" class="btn btn-secondary">
+              Cancel & Return
+            </button>
+            <button type="submit" id="btn-submit-assessment" class="btn btn-primary btn-lg">
+              SUBMIT ASSESSMENT & CALCULATE BASELINE →
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: ASSESSMENT RESULT
+         ==================================================================== -->
+    <section id="view-employee-result" style="display: none; max-width: 1050px; margin: 0 auto;">
+      <div class="block-card block-card-accent">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>COMPETENCY ASSESSMENT RESULTS</h2>
+          </div>
+          <span class="badge-pixel text-forest" id="result-badge-type">BASELINE ESTABLISHED</span>
+        </div>
+
+        <!-- Result Metrics Header -->
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Attempt Status</div>
+            <div class="stat-tile-value" id="res-stat-attempt">Attempt #1</div>
+            <div class="stat-tile-desc" id="res-stat-attempt-desc">Official Baseline Established</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Overall Score</div>
+            <div class="stat-tile-value" id="res-stat-overall">0.0%</div>
+            <div class="stat-tile-desc" id="res-stat-correct-count">0 of 17 correct</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Baseline Rule</div>
+            <div class="stat-tile-value" style="font-size: 1.1rem; color: var(--color-forest);">PERMANENT</div>
+            <div class="stat-tile-desc">Baseline preserved for growth tracking</div>
+          </div>
+        </div>
+
+        <!-- Competency Breakdown Cards -->
+        <div style="margin-top: var(--space-lg);">
+          <h3 style="margin-bottom: var(--space-md);">COMPETENCY PROFICIENCY BREAKDOWN</h3>
+          <div class="competencies-grid" id="result-competencies-grid">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Question Review Accordion -->
+        <div style="margin-top: var(--space-xl);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+            <h3>DETAILED QUESTION-BY-QUESTION REVIEW</h3>
+            <button id="btn-toggle-review" class="btn btn-secondary btn-sm">
+              Toggle Answers & Explanations
+            </button>
+          </div>
+          <div id="result-review-container" style="display: none;">
+            <!-- Review items injected here -->
+          </div>
+        </div>
+
+        <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-sm);">
+          <button id="btn-result-to-dashboard" class="btn btn-primary">
+            ← Return to Dashboard
+          </button>
+          <button id="btn-retake-assessment" class="btn btn-secondary">
+            Retake Assessment
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: ADMIN DASHBOARD
+         ==================================================================== -->
+    <section id="view-admin-dashboard" style="display: none;">
+      <div class="block-card block-card-ochre">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h1>ADMINISTRATOR CONTROL PANEL</h1>
+          </div>
+          <span class="user-role-badge role-admin">ADMINISTRATOR</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md);">
+          System Overview, Role Authorization Boundaries, and Official Statistical Competency Health.
+        </p>
+
+        <!-- Admin System Metrics -->
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Total Officers</div>
+            <div class="stat-tile-value" id="adm-stat-users">0</div>
+            <div class="stat-tile-desc" id="adm-stat-user-breakdown">0 Employees • 0 Admins</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Departments</div>
+            <div class="stat-tile-value" id="adm-stat-depts">0</div>
+            <div class="stat-tile-desc">MoSPI & NSSTA Wings</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Competencies</div>
+            <div class="stat-tile-value" id="adm-stat-comps">0</div>
+            <div class="stat-tile-desc">Across 4 Official Domains</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Assessment Attempts</div>
+            <div class="stat-tile-value" id="adm-stat-attempts">0</div>
+            <div class="stat-tile-desc">Completed evaluations</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Sample Courses</div>
+            <div class="stat-tile-value" id="adm-stat-courses">0</div>
+            <div class="stat-tile-desc">iGOT / NSSTA TPAC foundation</div>
+          </div>
+        </div>
+
+        <!-- Recent Assessments Table -->
+        <div class="block-card" style="margin-top: var(--space-lg);">
+          <div class="block-card-header">
+            <div class="block-card-title">
+              <h2>RECENT OFFICER ASSESSMENTS</h2>
+            </div>
+            <span class="badge-pixel text-forest">LIVE AUDIT LOG</span>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Attempt ID</th>
+                  <th>Officer Name</th>
+                  <th>Username</th>
+                  <th>Department</th>
+                  <th>Score</th>
+                  <th>Baseline Attempt</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="adm-table-recent-body">
+                <tr>
+                  <td colspan="7" style="text-align: center; color: var(--color-ink-muted);">
+                    No assessment attempts recorded yet.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Security & Integration Notice -->
+        <div class="explanation-box" style="margin-top: var(--space-md);">
+          <strong>🛡️ Role Authorization Enforced:</strong> All <code>/api/admin/*</code> routes are strictly protected by server-side role verification (<code>requireRole('admin')</code>). Non-admin users attempting to invoke these routes receive HTTP 403 Forbidden.
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW: GENERIC PLACEHOLDER FOR FUTURE MODULES
+         ==================================================================== -->
+    <section id="view-placeholder" style="display: none;">
+      <div class="placeholder-module-card">
+        <span class="placeholder-badge" id="pl-badge">STAGE X IN DEVELOPMENT</span>
+        <h2 class="placeholder-title" id="pl-title">Module Under Development</h2>
+        <p class="placeholder-desc" id="pl-desc">
+          This section is scheduled for implementation in a subsequent stage of the NAVBODH project.
+        </p>
+        <div class="placeholder-owner-box">
+          <div style="font-size: 1.8rem;">📦</div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem;" id="pl-owner">Assigned Contributor: --</div>
+            <div style="font-size: 0.8rem; color: var(--color-ink-muted);" id="pl-responsibilities">
+              Database schema tables and API scaffolds are already provisioned in Stage 1 (Core Foundation).
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Application Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div>
+        <strong>NAVBODH</strong> — Skill Intelligence & Learning Platform for Official Statistics
+        <div style="color: var(--color-sage-light); font-size: 0.75rem; margin-top: 2px;">
+          Stage 1: Core Foundation • Smart India Hackathon 2026
+        </div>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.75rem;">
+        Stack: HTML • CSS • Vanilla JS • Node.js • Express • SQLite
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/api.js"></script>
+  <script src="/employee.js"></script>
+  <script src="/admin.js"></script>
+  <script>
+    // Global Toast Notification Helper
+    window.showToast = function(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ')}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = '0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+  </script>
+</body>
+</html>
