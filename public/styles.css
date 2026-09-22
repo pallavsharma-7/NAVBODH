@@ -1523,3 +1523,84 @@ textarea.form-control {
   color: var(--color-paper-light);
 }
 
+/* ==========================================================================
+   STAGE 5: ADMIN & INTEGRATION STYLES (OWNER: PALAK)
+   ========================================================================== */
+
+/* Integrations Grid */
+.integrations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+/* Course Source Badges */
+.badge-igot {
+  background-color: var(--color-muted-teal-light);
+  color: var(--color-muted-teal);
+  border: 1px solid var(--color-muted-teal);
+}
+
+.badge-nssta {
+  background-color: var(--color-ochre-light);
+  color: var(--color-ochre);
+  border: 1px solid var(--color-ochre);
+}
+
+.badge-local {
+  background-color: var(--color-forest-light);
+  color: var(--color-forest);
+  border: 1px solid var(--color-forest);
+}
+
+/* Modal Overlay & Card for Officer Profile Inspection */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(32, 37, 34, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: var(--space-md);
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  background-color: var(--color-surface);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-block-lg);
+  max-width: 850px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-md);
+  background-color: var(--color-paper-light);
+  border-bottom: var(--border-block);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-body {
+  padding: var(--space-md);
+}
+
+/* Responsive Grid 2-Column Helper */
+.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+}

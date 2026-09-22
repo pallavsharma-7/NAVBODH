@@ -11,6 +11,7 @@ const intelligenceRoutes = require('./routes-intelligence');
 const learningRoutes = require('./routes-learning');
 const gamificationRoutes = require('./routes-gamification');
 const adminRoutes = require('./routes-admin');
+const integrationsRoutes = require('./routes-integrations');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,7 @@ app.use('/api/intelligence', intelligenceRoutes);
 app.use('/api/learning', learningRoutes);
 app.use('/api/gamification', gamificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/integrations', integrationsRoutes);
 
 // Catch-all 404 handler for unknown API routes
 app.use('/api', (req, res) => {

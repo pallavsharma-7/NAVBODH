@@ -1,11 +1,11 @@
 # NAVBODH (नवबोध)
 ### Personalized Skill Intelligence & Learning Platform for India's Official Statistical System
 
-> **Stage 4: Gamification** | Smart India Hackathon 2026  
-> **Repository:** [pallavsharma-7/NAVBODH](https://github.com/pallavsharma-7/NAVBODH)  
-> **Current Branch:** `pallav-gamification`  
-> **Predecessor Branch:** `pathika-learning` (Commit `1993c20`)  
-> **Contributor (Gamification):** Pallav  
+> **Stage 5: Admin + Integration** | Smart India Hackathon 2026
+> **Repository:** [pallavsharma-7/NAVBODH](https://github.com/pallavsharma-7/NAVBODH)
+> **Current Branch:** `palak-admin-integration`
+> **Predecessor Branch:** `pallav-gamification` (Commit `e86e184`)
+> **Contributor (Admin + Integration):** Palak
 
 ---
 
@@ -351,6 +351,51 @@ Stage 4 introduces a persistent, baseline-aware, explainable **Gamification & Re
 
 ---
 
+---
+
+## 5. Stage 5: Admin + Integration Module Architecture
+
+Stage 5 completes the enterprise administrative governance and cross-module system integration for NAVBODH:
+
+### 1. Executive Admin Dashboard (`GET /api/admin/overview`)
+- **Server-Side Authorization:** Strictly protected by `requireAuth` and `requireRole('admin')`. Returns HTTP 403 Forbidden for non-admin users.
+- **Real Aggregate Database Metrics:**
+  - Total users, employees, and administrators breakdown
+  - Active learners count (officers with assessments, lessons, or quizzes)
+  - Division-wise employee count, assessed count, and average scores
+  - 4-Domain competency health benchmarks (Statistical, Technical, Digital Governance, Behavioural)
+  - Top identified workforce skill gaps (highest competency deficit vs 80% target)
+  - Assessment attempts distribution (baseline vs subsequent, average score)
+  - Course enrollments, lesson completions, and quiz pass rates
+  - Reward ledger points distributed and unlocked achievements
+
+### 2. Officer Roster & Skill Inventory (`GET /api/admin/employees`)
+- **Safe Employee Profiles:** Excludes all passwords, password hashes, session tokens, and secrets.
+- **Consolidated Officer Metrics:**
+  - Competency evaluation counts, baseline average, current average, and growth %
+  - Assessment history (total attempts, latest score, last assessed timestamp)
+  - Learning progress (enrolled courses, completed courses, lessons completed)
+  - Quiz performance (quizzes attempted, quizzes passed, average score)
+  - Gamification points and unlocked badges
+  - Detailed 17-benchmark competency score matrix accessible via inspection drawer without employee impersonation
+- **Safe Filtering:** Supports `department_id` and keyword search without privilege escalation.
+
+### 3. Learning Content & Curriculum Management (`GET /api/admin/content`)
+- Comprehensive overview of all 6 curated statistical courses across iGOT, NSSTA, and Local catalogs.
+- Attached lesson curriculum syllabi, duration, and reference materials.
+- Mapped competencies with growth impact scores.
+- Associated evaluation quizzes, pass benchmarks, and question banks.
+
+### 4. Truthful System Integration Status (`GET /api/integrations/status`)
+- Clearly distinguishes simulated demonstration adapters from live operational storage:
+  - **AI Intelligence Assistant:** `simulated` / `rules_based_fallback` (Local Deterministic Intelligence Engine)
+  - **iGOT-Karmayogi Platform:** `simulated` / `demo_catalog` (3 sample civil service modules)
+  - **NSSTA TPAC Academy:** `simulated` / `demo_curriculum` (2 sample specialized statistical modules)
+  - **SQLite Database Storage:** `operational` / `wal_journal` (Active embedded relational storage)
+  - **Gamification Reward Ledger:** `operational` / `immutable_ledger` (Idempotent event-keyed ledger)
+
+---
+
 ## 8. Demo Credentials
 
 | Username | Password | Role | Name | Department / Cadre |
@@ -372,7 +417,7 @@ npm install
 ```bash
 npm test
 ```
-*Executes all 70 automated tests across `test-core.js` (17 tests), `test-intelligence.js` (10 tests), `test-learning.js` (13 tests), `test-gamification.js` (17 tests), and `test-frontend-integration.js` (13 tests).*
+*Executes all 93 automated tests across `test-core.js` (17 tests), `test-intelligence.js` (10 tests), `test-learning.js` (13 tests), `test-gamification.js` (17 tests), `test-frontend-integration.js` (16 tests), and `test-admin.js` (20 tests).*
 
 Individual test suites can be executed via:
 ```bash
@@ -381,6 +426,7 @@ npm run test:intelligence
 npm run test:learning
 npm run test:gamification
 npm run test:frontend
+npm run test:admin
 ```
 
 ### 3. Run Application
@@ -393,16 +439,15 @@ Access the application at: **`http://localhost:3000`**
 
 ## 10. Known Limitations & Explicit Disclaimers
 
-1. **Course Catalog Demo Labels:** Courses marked with `sample_nssta_tpac`, `sample_igot`, and `local_demo` represent sample training fixtures. There are **no live connections, credentials, or scraping** of external government portals.
-2. **Server-Side Scoring & Integrity:** All quiz scoring and gamification calculations are evaluated server-side.
-3. **Immutability of Baseline:** Baseline competency scores (`baseline_score`) remain permanent and unchanged throughout Gamification.
-4. **Future Stages:** Admin workforce skill heatmaps and macro analytics are scheduled for Stage 5 (Palak).
+1. **Course Catalog Demo Labels:** Courses marked with `sample_nssta_tpac`, `sample_igot`, and `local_demo` represent sample training fixtures. External API adapters operate in simulated demonstration mode in accordance with Stage 5 specifications.
+2. **Server-Side Authorization & Scoring:** All admin data, quiz scoring, and gamification calculations are strictly verified server-side.
+3. **Immutability of Baseline:** Baseline competency scores (`baseline_score`) remain permanent and unchanged throughout all stages.
 
 ---
 
-## 11. Information for Next Contributor (Stage 5: Palak)
+## 11. Information for Next Contributor (Stage 6: Parth)
 
-- **Next Stage:** Stage 5 — Admin Analytics & Workforce Heatmaps (`palak-admin`)
-- **Starting Branch:** Branch off from `pallav-gamification`
-- **Ownership:** Admin dashboard analytics, workforce skill deficiency heatmaps, division macro reports, course enrollment analytics, and quiz difficulty distribution reviews.
-- **Rule of Immutability:** Preserve Core, Intelligence, Learning, and Gamification contracts without breaking existing functionality.
+- **Next Stage:** Stage 6 — Final Hardening (`parth-hardening`)
+- **Starting Branch:** Branch off from `palak-admin-integration`
+- **Ownership:** Final production readiness, security penetration audit, performance optimization, and containerization.
+- **Rule of Immutability:** Preserve Core, Intelligence, Learning, Gamification, and Admin contracts without breaking accepted functionality.
