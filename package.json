@@ -6,13 +6,14 @@
   "scripts": {
     "start": "node server.js",
     "seed": "node seed.js",
-    "test": "node test/test-core.js && node test/test-intelligence.js && node test/test-learning.js && node test/test-gamification.js && node test/test-frontend-integration.js && node test/test-admin.js",
+    "test": "node test/test-core.js && node test/test-intelligence.js && node test/test-learning.js && node test/test-gamification.js && node test/test-frontend-integration.js && node test/test-admin.js && node test/test-hardening.js",
     "test:core": "node test/test-core.js",
     "test:intelligence": "node test/test-intelligence.js",
     "test:learning": "node test/test-learning.js",
     "test:gamification": "node test/test-gamification.js",
     "test:frontend": "node test/test-frontend-integration.js",
     "test:admin": "node test/test-admin.js",
+    "test:hardening": "node test/test-hardening.js",
     "dev": "node server.js"
   },
   "repository": {

@@ -87,7 +87,7 @@ function getSuggestedFocus(competencyCode, domain) {
  * Uses: employee_competencies + competencies + assessment_attempts
  * Formula: gap = target_score - current_score (gap > 0 is active deficiency)
  */
-router.get('/skill-gaps', requireAuth, (req, res) => {
+router.get(['/skill-gaps', '/intelligence/skill-gaps'], requireAuth, (req, res) => {
   try {
     const db = getDb();
     const userId = req.user.id;
@@ -287,7 +287,7 @@ router.get('/skill-gaps', requireAuth, (req, res) => {
  * Uses: employee_competencies -> competencies -> course_competencies -> courses
  * Prioritizes courses that resolve high-priority gaps and multi-competency deficiencies.
  */
-router.get('/recommendations', requireAuth, (req, res) => {
+router.get(['/recommendations', '/intelligence/recommendations'], requireAuth, (req, res) => {
   try {
     const db = getDb();
     const userId = req.user.id;
@@ -457,7 +457,7 @@ router.get('/recommendations', requireAuth, (req, res) => {
  * Groups learning sequence into progressive phases (High Priority -> Medium -> Low -> Mastery).
  * Reflects real-time changes whenever competency scores update.
  */
-router.get('/roadmap', requireAuth, (req, res) => {
+router.get(['/roadmap', '/intelligence/roadmap'], requireAuth, (req, res) => {
   try {
     const db = getDb();
     const userId = req.user.id;
@@ -697,7 +697,7 @@ router.get('/roadmap', requireAuth, (req, res) => {
  * Operates without external API keys and never exposes backend secrets.
  * Context is securely grounded in the authenticated employee's real competency gaps.
  */
-router.post('/study-assistant', requireAuth, async (req, res) => {
+router.post(['/study-assistant', '/intelligence/study-assistant'], requireAuth, async (req, res) => {
   try {
     const { message } = req.body;
 
@@ -889,6 +889,98 @@ router.post('/study-assistant', requireAuth, async (req, res) => {
       error: {
         code: 'STUDY_ASSISTANT_ERROR',
         message: 'An error occurred while processing your study assistant request.'
+      }
+    });
+  }
+});
+
+
+/**
+ * POST /api/intelligence/quiz-generator and POST /api/quiz-generator
+ *
+ * Generates tailored assessment / practice questions for a given competency or domain.
+ * Anti-cheating: Does not leak answer keys or explanations prior to submission.
+ */
+router.post(['/quiz-generator', '/intelligence/quiz-generator'], requireAuth, (req, res) => {
+  try {
+    const { competency_id, competency_code, domain, count = 3 } = req.body || {};
+    const db = getDb();
+
+    let questions = [];
+    const limit = Math.min(Math.max(1, parseInt(count, 10) || 3), 10);
+
+    if (competency_id) {
+      questions = db.prepare(`
+        SELECT aq.id, aq.competency_id, aq.question_text, aq.options_json, aq.difficulty,
+               c.code as competency_code, c.name as competency_name, c.domain
+        FROM assessment_questions aq
+        JOIN competencies c ON aq.competency_id = c.id
+        WHERE aq.competency_id = ?
+        LIMIT ?
+      `).all(Number(competency_id), limit);
+    } else if (competency_code) {
+      questions = db.prepare(`
+        SELECT aq.id, aq.competency_id, aq.question_text, aq.options_json, aq.difficulty,
+               c.code as competency_code, c.name as competency_name, c.domain
+        FROM assessment_questions aq
+        JOIN competencies c ON aq.competency_id = c.id
+        WHERE c.code = ?
+        LIMIT ?
+      `).all(String(competency_code).trim(), limit);
+    } else if (domain) {
+      questions = db.prepare(`
+        SELECT aq.id, aq.competency_id, aq.question_text, aq.options_json, aq.difficulty,
+               c.code as competency_code, c.name as competency_name, c.domain
+        FROM assessment_questions aq
+        JOIN competencies c ON aq.competency_id = c.id
+        WHERE c.domain = ?
+        LIMIT ?
+      `).all(String(domain).trim(), limit);
+    } else {
+      questions = db.prepare(`
+        SELECT aq.id, aq.competency_id, aq.question_text, aq.options_json, aq.difficulty,
+               c.code as competency_code, c.name as competency_name, c.domain
+        FROM assessment_questions aq
+        JOIN competencies c ON aq.competency_id = c.id
+        LIMIT ?
+      `).all(limit);
+    }
+
+    const formattedQuestions = questions.map(q => {
+      let options = [];
+      try {
+        options = JSON.parse(q.options_json);
+      } catch (e) {
+        options = [];
+      }
+      return {
+        id: q.id,
+        competency_id: q.competency_id,
+        competency_code: q.competency_code,
+        competency_name: q.competency_name,
+        domain: q.domain,
+        question_text: q.question_text,
+        options,
+        difficulty: q.difficulty
+      };
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        mode: 'rules_based_generator',
+        engine: 'NAVBODH Explainable Intelligence Assistant (Stage 2 Demo)',
+        total_questions: formattedQuestions.length,
+        questions: formattedQuestions
+      }
+    });
+  } catch (err) {
+    console.error('[Intelligence Route] Error generating quiz:', err);
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: 'QUIZ_GENERATOR_ERROR',
+        message: 'Could not generate quiz questions.'
       }
     });
   }

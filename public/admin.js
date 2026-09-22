@@ -11,6 +11,13 @@
 (function () {
   'use strict';
 
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
   // Admin State
   const adminState = {
     overviewData: null,
@@ -226,8 +233,8 @@
 
       html += `
         <tr>
-          <td style="font-weight: 600;">${d.name}</td>
-          <td style="font-family: var(--font-mono); font-weight: 700; color: var(--color-forest);">${d.code}</td>
+          <td style="font-weight: 600;">${escapeHtml(d.name)}</td>
+          <td style="font-family: var(--font-mono); font-weight: 700; color: var(--color-forest);">${escapeHtml(d.code)}</td>
           <td>${d.employee_count || 0}</td>
           <td>${assessedRate}</td>
           <td>
@@ -272,9 +279,9 @@
       html += `
         <tr>
           <td style="font-family: var(--font-mono); font-weight: 700;">#ATT-${a.id}</td>
-          <td style="font-weight: 600;">${a.employee_name || 'Officer'}</td>
-          <td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-ink-muted);">${a.username}</td>
-          <td>${a.department_name || 'MoSPI'}</td>
+          <td style="font-weight: 600;">${escapeHtml(a.employee_name || 'Officer')}</td>
+          <td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-ink-muted);">${escapeHtml(a.username)}</td>
+          <td>${escapeHtml(a.department_name || 'MoSPI')}</td>
           <td>
             <span class="badge-pixel text-forest" style="font-size: 0.9rem; font-weight: bold;">
               ${a.overall_score}%
@@ -285,7 +292,7 @@
               ${isBaseline ? '✓ BASELINE' : 'SUBSEQUENT'}
             </span>
           </td>
-          <td style="font-size: 0.8rem; color: var(--color-ink-muted);">${dateStr}</td>
+          <td style="font-size: 0.8rem; color: var(--color-ink-muted);">${escapeHtml(dateStr)}</td>
         </tr>
       `;
     });
@@ -365,13 +372,13 @@
       html += `
         <tr>
           <td>
-            <div style="font-weight: 700;">${emp.full_name}</div>
-            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--color-ink-muted);">${emp.username}</div>
-            <div style="font-size: 0.78rem; color: var(--color-forest);">${emp.designation || 'Statistical Officer'}</div>
+            <div style="font-weight: 700;">${escapeHtml(emp.full_name)}</div>
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--color-ink-muted);">${escapeHtml(emp.username)}</div>
+            <div style="font-size: 0.78rem; color: var(--color-forest);">${escapeHtml(emp.designation || 'Statistical Officer')}</div>
           </td>
           <td>
-            <div style="font-weight: 600;">${emp.department_name}</div>
-            <div style="font-size: 0.75rem; color: var(--color-ink-muted);">${emp.cadre || 'Official Cadre'}</div>
+            <div style="font-weight: 600;">${escapeHtml(emp.department_name)}</div>
+            <div style="font-size: 0.75rem; color: var(--color-ink-muted);">${escapeHtml(emp.cadre || 'Official Cadre')}</div>
           </td>
           <td>
             <span class="badge-pixel ${comp.assessed_count > 0 ? 'text-forest' : 'text-muted'}">
@@ -385,7 +392,7 @@
           </td>
           <td>
             <span class="badge-pixel ${growthColor}" style="font-size: 0.88rem; font-weight: 700;">
-              ${growthDisplay}
+              ${escapeHtml(growthDisplay)}
             </span>
           </td>
           <td>
@@ -448,8 +455,8 @@
         const gap = c.gap || 0;
         compRowsHtml += `
           <tr>
-            <td style="font-weight: 600;">${c.competency_name}</td>
-            <td><span class="badge-pixel" style="font-size: 0.75rem;">${c.domain}</span></td>
+            <td style="font-weight: 600;">${escapeHtml(c.competency_name)}</td>
+            <td><span class="badge-pixel" style="font-size: 0.75rem;">${escapeHtml(c.domain)}</span></td>
             <td>${c.baseline_score}%</td>
             <td><strong>${c.current_score}%</strong></td>
             <td>${c.target_score}%</td>
