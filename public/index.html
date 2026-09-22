@@ -923,85 +923,337 @@
     </section>
 
     <!-- ====================================================================
-         VIEW: ADMIN DASHBOARD
+         STAGE 5: ADMIN VIEWS (OWNER: PALAK)
          ==================================================================== -->
-    <section id="view-admin-dashboard" style="display: none;">
+
+    <!-- VIEW: ADMIN DASHBOARD / OVERVIEW -->
+    <section id="view-admin-dashboard" style="display: none; max-width: 1140px; margin: 0 auto;">
+      <!-- Hero / Welcome Banner -->
+      <div class="block-card block-card-ochre" style="margin-bottom: var(--space-lg);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <h1 id="adm-welcome-heading">ADMINISTRATOR CONTROL PANEL</h1>
+            <p id="adm-welcome-subtext" class="text-muted" style="margin-top: var(--space-2xs);">
+              Ministry of Statistics & Programme Implementation • Human Capital Intelligence & Training Administration
+            </p>
+          </div>
+          <div style="display: flex; gap: var(--space-xs); align-items: center; flex-wrap: wrap;">
+            <span class="user-role-badge role-admin">ADMINISTRATOR</span>
+            <span class="badge-pixel text-forest" id="adm-env-badge">STAGE 5 INTEGRATION</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- High-Level KPI Statistics Grid -->
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="stat-tile-label">Total Officers</div>
+          <div class="stat-tile-value" id="adm-stat-users">0</div>
+          <div class="stat-tile-desc" id="adm-stat-user-breakdown">0 Employees • 0 Admins</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Active Learners</div>
+          <div class="stat-tile-value text-forest" id="adm-stat-active-learners">0</div>
+          <div class="stat-tile-desc">Officers engaged in training</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Departments / Wings</div>
+          <div class="stat-tile-value" id="adm-stat-depts">0</div>
+          <div class="stat-tile-desc">NAD, SDRD, FOD, ESD, DIID, NSSTA</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Official Competencies</div>
+          <div class="stat-tile-value" id="adm-stat-comps">0</div>
+          <div class="stat-tile-desc">Across 4 MoSPI domains</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Assessment Attempts</div>
+          <div class="stat-tile-value text-ochre" id="adm-stat-attempts">0</div>
+          <div class="stat-tile-desc" id="adm-stat-avg-score">Avg Score: 0.0%</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Curated Courses</div>
+          <div class="stat-tile-value text-copper" id="adm-stat-courses">0</div>
+          <div class="stat-tile-desc" id="adm-stat-lessons">0 Lessons • 0 Quizzes</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Reward Points Issued</div>
+          <div class="stat-tile-value text-forest" id="adm-stat-points">0</div>
+          <div class="stat-tile-desc" id="adm-stat-achievements">0 Achievements unlocked</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Integration Status</div>
+          <div class="stat-tile-value" style="font-size: 1.1rem; color: var(--color-forest);" id="adm-stat-integrations">Operational</div>
+          <div class="stat-tile-desc">5/5 System adapters connected</div>
+        </div>
+      </div>
+
+      <!-- Domain Competency Proficiency Overview -->
+      <div class="block-card" style="margin-top: var(--space-lg);">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>WORKFORCE COMPETENCY & DOMAIN HEALTH</h2>
+          </div>
+          <span class="badge-pixel text-forest">MACRO ANALYTICS</span>
+        </div>
+        <p class="text-muted" style="font-size: 0.88rem; margin-bottom: var(--space-md);">
+          Aggregated proficiency benchmarks across official statistical divisions.
+        </p>
+        <div class="grid-2col" id="adm-domain-cards-container">
+          <!-- Dynamically injected domain cards -->
+        </div>
+      </div>
+
+      <!-- Top Identified Workforce Skill Gaps -->
+      <div class="block-card" style="margin-top: var(--space-lg);">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>TOP IDENTIFIED WORKFORCE SKILL Gaps</h2>
+          </div>
+          <span class="badge-priority-high">TRAINING PRIORITY</span>
+        </div>
+        <p class="text-muted" style="font-size: 0.88rem; margin-bottom: var(--space-md);">
+          Competencies exhibiting the widest deficit between official target score (80%) and workforce average proficiency.
+        </p>
+        <div id="adm-top-gaps-container">
+          <!-- Dynamically injected top gaps list -->
+        </div>
+      </div>
+
+      <!-- Departmental Learning & Assessment Matrix -->
+      <div class="block-card" style="margin-top: var(--space-lg);">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>DIVISION-WISE WORKFORCE MATRIX</h2>
+          </div>
+          <span class="badge-pixel text-forest">DEPARTMENT AUDIT</span>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Division / Wing</th>
+                <th>Code</th>
+                <th>Officers</th>
+                <th>Assessed</th>
+                <th>Avg Assessment Score</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="adm-table-departments-body">
+              <!-- Dynamically injected department rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Assessments Live Audit Log -->
+      <div class="block-card" style="margin-top: var(--space-lg);">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h2>RECENT OFFICER ASSESSMENTS</h2>
+          </div>
+          <span class="badge-pixel text-forest">AUDIT LOG</span>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Attempt</th>
+                <th>Officer Name</th>
+                <th>Username</th>
+                <th>Division</th>
+                <th>Score</th>
+                <th>Evaluation Type</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="adm-table-recent-body">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--color-ink-muted);">
+                  No assessment attempts recorded yet.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ADMIN EMPLOYEE ROSTER & SKILL INVENTORY -->
+    <section id="view-admin-employees" style="display: none; max-width: 1140px; margin: 0 auto;">
       <div class="block-card block-card-ochre">
         <div class="block-card-header">
           <div class="block-card-title">
-            <h1>ADMINISTRATOR CONTROL PANEL</h1>
+            <h1>OFFICER ROSTER & COMPETENCY INVENTORY</h1>
           </div>
-          <span class="user-role-badge role-admin">ADMINISTRATOR</span>
+          <span class="badge-pixel text-forest" id="adm-emp-count-badge">0 OFFICERS</span>
         </div>
-        <p class="text-muted" style="margin-bottom: var(--space-md);">
-          System Overview, Role Authorization Boundaries, and Official Statistical Competency Health.
+        <p class="text-muted" style="margin-bottom: var(--space-md); font-size: 0.88rem;">
+          Inspect individual officer learning profiles, permanent baseline records, growth percentages, and course completions.
         </p>
 
-        <!-- Admin System Metrics -->
-        <div class="stats-grid">
+        <!-- Search & Filter Controls -->
+        <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-bottom: var(--space-md); align-items: center;">
+          <div style="flex: 1; min-width: 240px;">
+            <input type="text" id="adm-emp-search-input" class="form-control" placeholder="🔍 Search officer name, username, or designation...">
+          </div>
+          <div style="min-width: 200px;">
+            <select id="adm-emp-dept-filter" class="form-control">
+              <option value="">All Divisions / Wings</option>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <button id="adm-emp-btn-reset-filters" class="btn btn-secondary btn-sm">
+            Reset Filters
+          </button>
+        </div>
+
+        <!-- Employees Data Table -->
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Officer</th>
+                <th>Division & Cadre</th>
+                <th>Competencies</th>
+                <th>Baseline vs Current</th>
+                <th>Baseline Growth</th>
+                <th>Courses / Lessons</th>
+                <th>Quiz Pass</th>
+                <th>Points</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adm-table-employees-body">
+              <tr>
+                <td colspan="9" style="text-align: center; color: var(--color-ink-muted); padding: var(--space-lg);">
+                  Loading official workforce roster...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Officer Competency Detail Modal / Drawer -->
+      <div id="adm-officer-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <h2 id="adm-modal-officer-name">Officer Competency Profile</h2>
+              <div id="adm-modal-officer-meta" class="text-muted" style="font-size: 0.85rem;">--</div>
+            </div>
+            <button id="adm-modal-btn-close" class="btn btn-secondary btn-sm" aria-label="Close modal">✕</button>
+          </div>
+          <div class="modal-body" id="adm-modal-body">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ADMIN LEARNING CONTENT MANAGEMENT -->
+    <section id="view-admin-content" style="display: none; max-width: 1140px; margin: 0 auto;">
+      <div class="block-card block-card-ochre">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h1>LEARNING ECOSYSTEM & CURRICULUM OVERSIGHT</h1>
+          </div>
+          <span class="badge-pixel text-forest">COURSE CATALOG</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md); font-size: 0.88rem;">
+          Audit official statistical courses, curriculum lessons, reference materials, knowledge quizzes, and competency linkages.
+        </p>
+
+        <!-- Content Summary Stats -->
+        <div class="stats-grid" style="margin-bottom: var(--space-lg);">
           <div class="stat-tile">
-            <div class="stat-tile-label">Total Officers</div>
-            <div class="stat-tile-value" id="adm-stat-users">0</div>
-            <div class="stat-tile-desc" id="adm-stat-user-breakdown">0 Employees • 0 Admins</div>
+            <div class="stat-tile-label">Total Courses</div>
+            <div class="stat-tile-value text-forest" id="adm-cnt-stat-courses">0</div>
+            <div class="stat-tile-desc">Curated learning modules</div>
           </div>
           <div class="stat-tile">
-            <div class="stat-tile-label">Departments</div>
-            <div class="stat-tile-value" id="adm-stat-depts">0</div>
-            <div class="stat-tile-desc">MoSPI & NSSTA Wings</div>
+            <div class="stat-tile-label">Total Lessons</div>
+            <div class="stat-tile-value" id="adm-cnt-stat-lessons">0</div>
+            <div class="stat-tile-desc">Across all modules</div>
           </div>
           <div class="stat-tile">
-            <div class="stat-tile-label">Competencies</div>
-            <div class="stat-tile-value" id="adm-stat-comps">0</div>
-            <div class="stat-tile-desc">Across 4 Official Domains</div>
+            <div class="stat-tile-label">Competency Links</div>
+            <div class="stat-tile-value text-ochre" id="adm-cnt-stat-comps">0</div>
+            <div class="stat-tile-desc">Mapped to syllabus</div>
           </div>
           <div class="stat-tile">
-            <div class="stat-tile-label">Assessment Attempts</div>
-            <div class="stat-tile-value" id="adm-stat-attempts">0</div>
-            <div class="stat-tile-desc">Completed evaluations</div>
-          </div>
-          <div class="stat-tile">
-            <div class="stat-tile-label">Sample Courses</div>
-            <div class="stat-tile-value" id="adm-stat-courses">0</div>
-            <div class="stat-tile-desc">iGOT / NSSTA TPAC foundation</div>
+            <div class="stat-tile-label">Knowledge Quizzes</div>
+            <div class="stat-tile-value text-copper" id="adm-cnt-stat-quizzes">0</div>
+            <div class="stat-tile-desc">Evaluated question banks</div>
           </div>
         </div>
 
-        <!-- Recent Assessments Table -->
+        <!-- Course Source Filter Pills -->
+        <div class="filter-pills-container" style="margin-bottom: var(--space-md);">
+          <span style="font-weight: 700; font-size: 0.85rem; margin-right: var(--space-xs);">Filter by Source:</span>
+          <button class="filter-pill active" data-source-filter="ALL" id="adm-cnt-filter-all">All Sources</button>
+          <button class="filter-pill" data-source-filter="sample_igot" id="adm-cnt-filter-igot">🏛️ iGOT-Karmayogi</button>
+          <button class="filter-pill" data-source-filter="sample_nssta_tpac" id="adm-cnt-filter-nssta">🎓 NSSTA TPAC</button>
+          <button class="filter-pill" data-source-filter="local_demo" id="adm-cnt-filter-local">🏢 Local Academy</button>
+        </div>
+
+        <!-- Courses Management List -->
+        <div id="adm-courses-container">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ADMIN INTEGRATION STATUS & ADAPTER MONITORING -->
+    <section id="view-admin-integrations" style="display: none; max-width: 1140px; margin: 0 auto;">
+      <div class="block-card block-card-ochre">
+        <div class="block-card-header">
+          <div class="block-card-title">
+            <h1>SYSTEM INTEGRATION & EXTERNAL ADAPTER STATUS</h1>
+          </div>
+          <span class="badge-pixel text-forest">STAGE 5 INTEGRATION</span>
+        </div>
+        <p class="text-muted" style="margin-bottom: var(--space-md); font-size: 0.88rem;">
+          Real-time diagnostics and truthful status monitoring for AI intelligence engines, civil service learning platforms, and core database adapters.
+        </p>
+
+        <!-- Official Demonstration Disclosure Banner -->
+        <div class="explanation-box" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--color-ochre);">
+          <strong>🏛️ Official Integration Disclosure:</strong> In accordance with Stage 5 architecture specifications, external training adapters operate in verified <em>simulated / demo</em> mode. Simulated adapters map realistic civil service curriculum to MoSPI competencies without claiming unauthorized live production credentials.
+        </div>
+
+        <!-- Integration Adapters Grid -->
+        <div class="integrations-grid" id="adm-integrations-cards-container">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Architecture & Adapter Readiness Table -->
         <div class="block-card" style="margin-top: var(--space-lg);">
           <div class="block-card-header">
             <div class="block-card-title">
-              <h2>RECENT OFFICER ASSESSMENTS</h2>
+              <h2>ADAPTER SPECIFICATIONS & ENDPOINTS</h2>
             </div>
-            <span class="badge-pixel text-forest">LIVE AUDIT LOG</span>
+            <span class="badge-pixel text-forest">ARCHITECTURE MATRIX</span>
           </div>
-
           <div class="data-table-container">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Attempt ID</th>
-                  <th>Officer Name</th>
-                  <th>Username</th>
-                  <th>Department</th>
-                  <th>Score</th>
-                  <th>Baseline Attempt</th>
-                  <th>Timestamp</th>
+                  <th>Adapter Component</th>
+                  <th>Adapter Type</th>
+                  <th>Configured Mode</th>
+                  <th>Live Connected</th>
+                  <th>Primary Endpoint</th>
+                  <th>Status</th>
                 </tr>
               </thead>
-              <tbody id="adm-table-recent-body">
-                <tr>
-                  <td colspan="7" style="text-align: center; color: var(--color-ink-muted);">
-                    No assessment attempts recorded yet.
-                  </td>
-                </tr>
+              <tbody id="adm-table-adapters-body">
+                <!-- Injected dynamically -->
               </tbody>
             </table>
           </div>
-        </div>
-
-        <!-- Security & Integration Notice -->
-        <div class="explanation-box" style="margin-top: var(--space-md);">
-          <strong>🛡️ Role Authorization Enforced:</strong> All <code>/api/admin/*</code> routes are strictly protected by server-side role verification (<code>requireRole('admin')</code>). Non-admin users attempting to invoke these routes receive HTTP 403 Forbidden.
         </div>
       </div>
     </section>

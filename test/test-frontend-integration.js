@@ -247,16 +247,58 @@ async function runBrowserSimulation() {
     assert.strictEqual(refreshRes.body.data.total_points, gamRes.body.data.total_points, 'Points remain unchanged on refresh');
     console.log('✓ PASS');
 
-    // 12. Logout
-    process.stdout.write('• Testing: Official logout & session invalidation... ');
+    // 13. Logout
+    process.stdout.write('• Testing: Official employee logout & session invalidation... ');
     const logoutRes = await client.postJson('/api/auth/logout', {});
     assert.strictEqual(logoutRes.status, 200);
     const checkUnauth = await client.getJson('/api/intelligence/skill-gaps');
     assert.strictEqual(checkUnauth.status, 401);
     console.log('✓ PASS');
 
+    // 14. Stage 5 Admin: Administrator Login & Portal Data Access
+    process.stdout.write('• Testing: Official Admin login for Dr. Anil Kumar (admin.navbodh)... ');
+    const adminLoginRes = await client.postJson('/api/auth/login', {
+      identifier: 'admin.navbodh',
+      password: 'AdminPass123!'
+    });
+    assert.strictEqual(adminLoginRes.status, 200);
+    assert.strictEqual(adminLoginRes.body.success, true);
+    assert.strictEqual(adminLoginRes.body.data.user.role, 'admin');
+    console.log('✓ PASS');
+
+    // 15. Stage 5 Admin: Overview, Employees Roster, Content & Integrations
+    process.stdout.write('• Testing: GET /api/admin/overview, /api/admin/employees, /api/admin/content, /api/integrations/status... ');
+    const admOverviewRes = await client.getJson('/api/admin/overview');
+    assert.strictEqual(admOverviewRes.status, 200);
+    assert.strictEqual(admOverviewRes.body.success, true);
+    assert.ok(admOverviewRes.body.data.summary.total_users >= 3);
+
+    const admEmpsRes = await client.getJson('/api/admin/employees');
+    assert.strictEqual(admEmpsRes.status, 200);
+    assert.strictEqual(admEmpsRes.body.success, true);
+    assert.ok(Array.isArray(admEmpsRes.body.data.employees));
+
+    const admContentRes = await client.getJson('/api/admin/content');
+    assert.strictEqual(admContentRes.status, 200);
+    assert.strictEqual(admContentRes.body.success, true);
+    assert.strictEqual(admContentRes.body.data.courses.length, 6);
+
+    const intStatusRes = await client.getJson('/api/integrations/status');
+    assert.strictEqual(intStatusRes.status, 200);
+    assert.strictEqual(intStatusRes.body.success, true);
+    assert.ok(intStatusRes.body.data.adapters);
+    console.log('✓ PASS');
+
+    // 16. Stage 5 Admin: Admin Logout
+    process.stdout.write('• Testing: Admin logout & session cleanup... ');
+    const adminLogoutRes = await client.postJson('/api/auth/logout', {});
+    assert.strictEqual(adminLogoutRes.status, 200);
+    const checkAdminUnauth = await client.getJson('/api/admin/overview');
+    assert.strictEqual(checkAdminUnauth.status, 401);
+    console.log('✓ PASS');
+
     console.log('\n===============================================================');
-    console.log('  ALL BROWSER SIMULATION LIFECYCLE CHECKS PASSED (9/9)');
+    console.log('  ALL BROWSER SIMULATION LIFECYCLE CHECKS PASSED');
     console.log('===============================================================\n');
   } finally {
     if (server) {

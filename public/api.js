@@ -206,10 +206,33 @@
       }
     },
 
-    // Admin Shortcuts
+    // Admin Shortcuts (Stage 5: Owner Palak)
     admin: {
       getOverview() {
         return API.get('/api/admin/overview');
+      },
+      getEmployees(params = {}) {
+        const q = new URLSearchParams(params).toString();
+        return API.get(`/api/admin/employees${q ? '?' + q : ''}`);
+      },
+      getContent() {
+        return API.get('/api/admin/content');
+      },
+      getWorkforceInsights() {
+        return API.get('/api/admin/workforce-insights');
+      },
+      getQuizReview() {
+        return API.get('/api/admin/quiz-review');
+      },
+      getIntegrations() {
+        return API.get('/api/admin/integrations');
+      }
+    },
+
+    // Integration Shortcuts (Stage 5: Owner Palak)
+    integrations: {
+      getStatus() {
+        return API.get('/api/integrations/status');
       }
     }
   };

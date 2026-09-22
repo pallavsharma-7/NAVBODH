@@ -49,6 +49,9 @@
     viewEmpRoadmap: document.getElementById('view-employee-roadmap'),
     viewEmpAssistant: document.getElementById('view-employee-assistant'),
     viewAdminDashboard: document.getElementById('view-admin-dashboard'),
+    viewAdminEmployees: document.getElementById('view-admin-employees'),
+    viewAdminContent: document.getElementById('view-admin-content'),
+    viewAdminIntegrations: document.getElementById('view-admin-integrations'),
     viewPlaceholder: document.getElementById('view-placeholder'),
 
     // Stage 3 Learning Views
@@ -249,8 +252,11 @@
     if (els.viewQuizDetail) els.viewQuizDetail.style.display = 'none';
     if (els.viewQuizResult) els.viewQuizResult.style.display = 'none';
     if (els.viewEmpGamification) els.viewEmpGamification.style.display = 'none';
-    els.viewAdminDashboard.style.display = 'none';
-    els.viewPlaceholder.style.display = 'none';
+    if (els.viewAdminDashboard) els.viewAdminDashboard.style.display = 'none';
+    if (els.viewAdminEmployees) els.viewAdminEmployees.style.display = 'none';
+    if (els.viewAdminContent) els.viewAdminContent.style.display = 'none';
+    if (els.viewAdminIntegrations) els.viewAdminIntegrations.style.display = 'none';
+    if (els.viewPlaceholder) els.viewPlaceholder.style.display = 'none';
   }
 
   /**
@@ -396,9 +402,38 @@
       case 'admin-dashboard':
         els.headerAuthControls.style.display = 'flex';
         els.appNavBar.style.display = 'block';
-        els.viewAdminDashboard.style.display = 'block';
+        if (els.viewAdminDashboard) els.viewAdminDashboard.style.display = 'block';
         if (window.AdminPortal) {
           window.AdminPortal.loadAdminOverview();
+        }
+        break;
+
+      case 'admin-employees':
+      case 'admin-workforce':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        if (els.viewAdminEmployees) els.viewAdminEmployees.style.display = 'block';
+        if (window.AdminPortal) {
+          window.AdminPortal.loadAdminEmployees();
+        }
+        break;
+
+      case 'admin-content':
+      case 'admin-quizzes':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        if (els.viewAdminContent) els.viewAdminContent.style.display = 'block';
+        if (window.AdminPortal) {
+          window.AdminPortal.loadAdminContent();
+        }
+        break;
+
+      case 'admin-integrations':
+        els.headerAuthControls.style.display = 'flex';
+        els.appNavBar.style.display = 'block';
+        if (els.viewAdminIntegrations) els.viewAdminIntegrations.style.display = 'block';
+        if (window.AdminPortal) {
+          window.AdminPortal.loadAdminIntegrations();
         }
         break;
 
@@ -422,23 +457,19 @@
 
     if (user.role === 'admin') {
       const adminTabs = [
-        { id: 'admin-dashboard', label: 'Dashboard', future: false },
-        { id: 'admin-workforce', label: 'Workforce Insights', future: true, stage: 'Stage 5', owner: 'Palak', desc: 'Workforce skill matrix, division heatmaps, and macro competency analytics.' },
-        { id: 'admin-content', label: 'Learning Content', future: true, stage: 'Stage 5', owner: 'Palak', desc: 'Manage official course catalog and external iGOT/NSSTA content linkages.' },
-        { id: 'admin-quizzes', label: 'Quiz Review', future: true, stage: 'Stage 5', owner: 'Palak', desc: 'Audit question banks, evaluate item difficulties, and approve quiz modules.' }
+        { id: 'admin-dashboard', label: 'Dashboard' },
+        { id: 'admin-employees', label: 'Officer Roster' },
+        { id: 'admin-content', label: 'Learning Content' },
+        { id: 'admin-integrations', label: 'Integrations' }
       ];
 
       adminTabs.forEach(t => {
         const btn = document.createElement('button');
         btn.className = 'nav-tab';
         btn.dataset.tab = t.id;
-        btn.innerHTML = `${t.label} ${t.future ? `<span class="tab-badge-future">${t.stage}</span>` : ''}`;
+        btn.innerHTML = t.label;
         btn.onclick = () => {
-          if (t.future) {
-            switchView('placeholder', t);
-          } else {
-            switchView(t.id);
-          }
+          switchView(t.id);
         };
         els.navTabsContainer.appendChild(btn);
       });
