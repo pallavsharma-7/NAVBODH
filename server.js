@@ -37,6 +37,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api', coreRoutes);
 app.use('/api', learningRoutes);
+app.use('/api', intelligenceRoutes);
+app.use('/api', gamificationRoutes);
 app.use('/api/intelligence', intelligenceRoutes);
 app.use('/api/learning', learningRoutes);
 app.use('/api/gamification', gamificationRoutes);
@@ -61,11 +63,22 @@ app.use((req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'INVALID_JSON',
+        message: 'Malformed JSON payload in request body.'
+      }
+    });
+  }
+
   console.error('[Server Error]', err);
-  return res.status(err.status || 500).json({
+  const status = (typeof err.status === 'number' && err.status >= 400 && err.status < 600) ? err.status : 500;
+  return res.status(status).json({
     success: false,
     error: {
-      code: err.code || 'INTERNAL_ERROR',
+      code: err.code || (status === 400 ? 'INVALID_REQUEST' : (status === 404 ? 'NOT_FOUND' : 'INTERNAL_ERROR')),
       message: process.env.NODE_ENV === 'production'
         ? 'An unexpected server error occurred.'
         : (err.message || 'An unexpected server error occurred.')

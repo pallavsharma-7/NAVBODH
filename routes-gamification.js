@@ -470,7 +470,7 @@ function getLeaderboard() {
  * GET /api/gamification/rewards and GET /api/rewards
  * Note: Placed BEFORE router.get('/') to prevent matching conflict if subroutes are called
  */
-router.get('/rewards', requireAuth, (req, res) => {
+router.get(['/rewards', '/gamification/rewards'], requireAuth, (req, res) => {
   try {
     const userId = req.user.id;
     const db = getDb();
@@ -508,7 +508,7 @@ router.get('/rewards', requireAuth, (req, res) => {
 /**
  * GET /api/gamification/leaderboard and GET /api/leaderboard
  */
-router.get('/leaderboard', requireAuth, (req, res) => {
+router.get(['/leaderboard', '/gamification/leaderboard'], requireAuth, (req, res) => {
   try {
     const leaderboard = getLeaderboard();
 
@@ -534,7 +534,7 @@ router.get('/leaderboard', requireAuth, (req, res) => {
 /**
  * GET /api/gamification/achievements and GET /api/achievements
  */
-router.get('/achievements', requireAuth, (req, res) => {
+router.get(['/achievements', '/gamification/achievements'], requireAuth, (req, res) => {
   try {
     const userId = req.user.id;
     const db = getDb();
@@ -583,7 +583,7 @@ router.get('/achievements', requireAuth, (req, res) => {
  * GET /api/gamification
  * Returns comprehensive employee gamification profile (points, streak, growth, badges, milestones, rank, recent activity).
  */
-router.get('/', requireAuth, (req, res) => {
+router.get(['/', '/gamification'], requireAuth, (req, res) => {
   try {
     const userId = req.user.id;
     const db = getDb();
