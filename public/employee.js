@@ -2190,12 +2190,12 @@
         const res = await API.submitAssessment(state.currentAssessment.id, state.assessmentAnswers);
         
         if (res.is_baseline) {
-          window.showToast('Initial Baseline established successfully!', 'success');
+          window.showToast('Initial Baseline established! Redirecting to your Personalized Roadmap...', 'success');
         } else {
-          window.showToast('Assessment submitted! Current competency scores updated.', 'success');
+          window.showToast('Assessment submitted! Redirecting to your updated Personalized Roadmap...', 'success');
         }
 
-        switchView('result');
+        switchView('roadmap');
       } catch (err) {
         console.error('Assessment submit error:', err);
         window.showToast(err.message || 'Could not submit assessment', 'error');
