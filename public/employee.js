@@ -129,6 +129,7 @@
     resultCompetenciesGrid: document.getElementById('result-competencies-grid'),
     btnToggleReview: document.getElementById('btn-toggle-review'),
     resultReviewContainer: document.getElementById('result-review-container'),
+    btnResultToRoadmap: document.getElementById('btn-result-to-roadmap'),
     btnResultToDashboard: document.getElementById('btn-result-to-dashboard'),
     btnRetakeAssessment: document.getElementById('btn-retake-assessment'),
 
@@ -475,18 +476,15 @@
       });
     } else {
       const employeeTabs = [
-        { id: 'dashboard', label: 'Dashboard', future: false },
-        { id: 'skill-gaps', label: 'Skill Gaps', future: false },
-        { id: 'recommendations', label: 'Recommendations', future: false },
-        { id: 'roadmap', label: 'Roadmap', future: false },
-        { id: 'learning', label: 'Learning', future: false },
-        { id: 'quizzes', label: 'Quizzes', future: false },
-        { id: 'assistant', label: 'Study Assistant', future: false },
-        { id: 'gamification', label: 'Gamification & Badges', future: false },
-        { id: 'leaderboard', label: 'Leaderboard', future: false },
-        { id: 'assessment', label: 'Assessment', future: false },
-        { id: 'result', label: 'Results', future: false },
-        { id: 'profile', label: 'Profile', future: false }
+        { id: 'dashboard', label: 'Dashboard' },
+        { id: 'assessment', label: 'Assessment' },
+        { id: 'roadmap', label: 'Personalized Roadmap' },
+        { id: 'skill-gaps', label: 'Skill Gaps' },
+        { id: 'learning', label: 'Learning & iGOT' },
+        { id: 'quizzes', label: 'Quizzes' },
+        { id: 'assistant', label: 'AI Assistant' },
+        { id: 'leaderboard', label: 'Recognition & Roster' },
+        { id: 'profile', label: 'Profile' }
       ];
 
       employeeTabs.forEach(t => {
@@ -1117,12 +1115,15 @@
             <span style="font-size: 0.78rem; color: var(--color-ink-muted); font-family: var(--font-mono);">
               Relevance: ${course.rankingScore}
             </span>
-            <div style="display: flex; gap: var(--space-xs);">
+            <div style="display: flex; gap: var(--space-xs); flex-wrap: wrap;">
+              <a href="https://igotkarmayogi.gov.in/app/search?q=${encodeURIComponent(course.title)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
+                <span>Open in iGOT</span> ↗
+              </a>
               <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.switchView('roadmap')">
                 In Roadmap
               </button>
               <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.openCourse(${course.courseId})">
-                Start Course →
+                In-Platform View →
               </button>
             </div>
           </div>
@@ -1134,18 +1135,119 @@
     els.recommendationsContainer.innerHTML = html;
   }
 
+  function createVisualCompetencySvg(stages, allCompetencies) {
+    const domains = [
+      { name: 'Statistical', angle: -Math.PI / 4, color: '#16a34a' },
+      { name: 'Technical', angle: -3 * Math.PI / 4, color: '#2563eb' },
+      { name: 'Digital Governance', angle: 3 * Math.PI / 4, color: '#7c3aed' },
+      { name: 'Behavioural / Managerial', angle: Math.PI / 4, color: '#d97706' }
+    ];
+
+    const compByDomain = {};
+    (allCompetencies || []).forEach(c => {
+      const dom = c.domain || 'Statistical';
+      if (!compByDomain[dom]) compByDomain[dom] = [];
+      compByDomain[dom].push(c);
+    });
+
+    const width = 860;
+    const height = 440;
+    const cx = width / 2;
+    const cy = height / 2;
+
+    let totalScore = 0;
+    let compCount = (allCompetencies || []).length;
+    (allCompetencies || []).forEach(c => totalScore += (c.currentScore || c.current_score || 0));
+    const avgScore = compCount > 0 ? Math.round(totalScore / compCount) : 0;
+
+    let svg = `<svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: auto; max-height: 440px; font-family: system-ui, sans-serif;">`;
+    svg += `<defs>
+      <filter id="map-drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.10"/>
+      </filter>
+    </defs>`;
+
+    [65, 135, 200].forEach(r => {
+      svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e2e8f0" stroke-dasharray="4 4" stroke-width="1.2"/>`;
+    });
+
+    domains.forEach(d => {
+      const radius = 145;
+      const dx = cx + radius * Math.cos(d.angle);
+      const dy = cy + radius * Math.sin(d.angle);
+
+      svg += `<line x1="${cx}" y1="${cy}" x2="${dx}" y2="${dy}" stroke="${d.color}" stroke-width="2.5" stroke-dasharray="5 3"/>`;
+
+      svg += `<g transform="translate(${dx}, ${dy})" filter="url(#map-drop-shadow)">
+        <circle r="36" fill="#ffffff" stroke="${d.color}" stroke-width="3"/>
+        <text y="-4" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">${d.name.split(' ')[0]}</text>
+        <text y="12" text-anchor="middle" font-size="10" font-weight="600" fill="${d.color}">${(compByDomain[d.name] || []).length} Skills</text>
+      </g>`;
+
+      const comps = compByDomain[d.name] || [];
+      comps.forEach((c, idx) => {
+        const spreadAngle = d.angle + (idx - (comps.length - 1) / 2) * 0.36;
+        const leafRadius = 205;
+        const lx = cx + leafRadius * Math.cos(spreadAngle);
+        const ly = cy + leafRadius * Math.sin(spreadAngle);
+
+        const current = c.currentScore !== undefined ? c.currentScore : (c.current_score || 0);
+        const target = c.targetScore !== undefined ? c.targetScore : (c.target_score || 80);
+        const gap = c.gap !== undefined ? c.gap : (target - current > 0 ? parseFloat((target - current).toFixed(1)) : 0);
+
+        let statusColor = '#16a34a';
+        if (gap >= 30) statusColor = '#dc2626';
+        else if (gap >= 15) statusColor = '#d97706';
+        else if (gap > 0) statusColor = '#2563eb';
+
+        svg += `<line x1="${dx}" y1="${dy}" x2="${lx}" y2="${ly}" stroke="#cbd5e1" stroke-width="1.2"/>`;
+
+        svg += `<g transform="translate(${lx}, ${ly})" filter="url(#map-drop-shadow)">
+          <rect x="-62" y="-13" width="124" height="26" rx="13" fill="#ffffff" stroke="${statusColor}" stroke-width="2"/>
+          <text y="-1" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f172a">${(c.competency || c.name || 'Skill').slice(0, 16)}</text>
+          <text y="9" text-anchor="middle" font-size="8.5" font-weight="600" fill="${statusColor}">${current}/${target} (${gap > 0 ? `-${gap}` : 'Met'})</text>
+        </g>`;
+      });
+    });
+
+    svg += `<g transform="translate(${cx}, ${cy})" filter="url(#map-drop-shadow)">
+      <circle r="44" fill="#0f172a" stroke="#1e293b" stroke-width="4"/>
+      <text y="-8" text-anchor="middle" font-size="10.5" font-weight="700" fill="#f8fafc">CURRENT PROFILE</text>
+      <text y="10" text-anchor="middle" font-size="15" font-weight="800" fill="#38bdf8">${avgScore}% AVG</text>
+      <text y="21" text-anchor="middle" font-size="8" font-weight="600" fill="#94a3b8">MoSPI Officer</text>
+    </g>`;
+
+    svg += `<g transform="translate(12, 16)">
+      <rect width="250" height="66" fill="#f8fafc" rx="6" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="10" y="16" font-size="10" font-weight="700" fill="#1e293b">VISUAL COMPETENCY GROWTH MAP</text>
+      <circle cx="20" cy="34" r="5" fill="#dc2626"/><text x="30" y="37" font-size="8.5" fill="#475569">High Gap (≥30)</text>
+      <circle cx="120" cy="34" r="5" fill="#d97706"/><text x="130" y="37" font-size="8.5" fill="#475569">Medium Gap (15-29)</text>
+      <circle cx="20" cy="50" r="5" fill="#2563eb"/><text x="30" y="53" font-size="8.5" fill="#475569">Low Gap (&lt;15)</text>
+      <circle cx="120" cy="50" r="5" fill="#16a34a"/><text x="130" y="53" font-size="8.5" fill="#475569">Target Met ✓</text>
+    </g>`;
+
+    svg += `</svg>`;
+    return svg;
+  }
+
   async function loadRoadmapView() {
     try {
       if (!els.roadmapPhasesContainer) return;
       els.roadmapPhasesContainer.innerHTML = '<div style="text-align:center; padding: var(--space-xl); color: var(--color-ink-muted);">Generating dynamic learning roadmap...</div>';
 
-      const res = await API.intelligence.getRoadmap();
+      const [res, gapsRes] = await Promise.all([
+        API.intelligence.getRoadmap(),
+        API.intelligence.getSkillGaps().catch(() => ({ data: { allCompetencies: [] } }))
+      ]);
 
       if (!res.hasAssessment) {
         els.roadmapStatStages.textContent = '0';
         els.roadmapStatGaps.textContent = '0';
         els.roadmapStatHours.textContent = '0 hrs';
         els.roadmapStatDomain.textContent = '--';
+
+        const mapContainer = document.getElementById('roadmap-visual-map-container');
+        if (mapContainer) mapContainer.style.display = 'none';
 
         els.roadmapPhasesContainer.innerHTML = `
           <div class="empty-state-card">
@@ -1164,6 +1266,13 @@
       els.roadmapStatGaps.textContent = summary.totalGapsToBridge;
       els.roadmapStatHours.textContent = `${summary.totalEstimatedHours} hrs`;
       els.roadmapStatDomain.textContent = summary.primaryFocusDomain;
+
+      // Render Visual SVG Radial Competency Growth Map
+      const mapContainer = document.getElementById('roadmap-visual-map-container');
+      if (mapContainer && gapsRes && gapsRes.data) {
+        mapContainer.style.display = 'block';
+        mapContainer.innerHTML = createVisualCompetencySvg(res.stages, gapsRes.data.allCompetencies || gapsRes.data.gaps || []);
+      }
 
       renderRoadmapPhases(res.stages);
 
@@ -1201,15 +1310,21 @@
         if (item.recommendedCourses && item.recommendedCourses.length > 0) {
           item.recommendedCourses.forEach(crs => {
             const courseTargetId = crs.course_id || crs.courseId || crs.id;
+            const igotUrl = `https://igotkarmayogi.gov.in/app/search?q=${encodeURIComponent(crs.title)}`;
             coursesHtml += `
-              <div class="milestone-course-chip">
+              <div class="milestone-course-chip" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 14px; background: #ffffff; border: 1px solid var(--color-border); border-radius: 6px; margin-top: 6px;">
                 <div>
                   <strong>${crs.title}</strong>
                   <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-ink-muted); margin-left: 6px;">(${crs.sourceDisplayName || crs.source} • ${crs.durationHours} hrs)</span>
                 </div>
-                <button class="btn btn-secondary btn-sm" onclick="window.EmployeePortal.openCourse(${courseTargetId})">
-                  Start Learning →
-                </button>
+                <div style="display: flex; gap: 8px;">
+                  <a href="${igotUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none;">
+                    <span>Open in iGOT</span> ↗
+                  </a>
+                  <button class="btn btn-primary btn-sm" onclick="window.EmployeePortal.openCourse(${courseTargetId})">
+                    In-Platform View →
+                  </button>
+                </div>
               </div>
             `;
           });
@@ -2075,12 +2190,12 @@
         const res = await API.submitAssessment(state.currentAssessment.id, state.assessmentAnswers);
         
         if (res.is_baseline) {
-          window.showToast('Initial Baseline established successfully!', 'success');
+          window.showToast('Initial Baseline established! Redirecting to your Personalized Roadmap...', 'success');
         } else {
-          window.showToast('Assessment submitted! Current competency scores updated.', 'success');
+          window.showToast('Assessment submitted! Redirecting to your updated Personalized Roadmap...', 'success');
         }
 
-        switchView('result');
+        switchView('roadmap');
       } catch (err) {
         console.error('Assessment submit error:', err);
         window.showToast(err.message || 'Could not submit assessment', 'error');
@@ -2088,6 +2203,12 @@
     });
 
     // Result Actions
+    if (els.btnResultToRoadmap) {
+      els.btnResultToRoadmap.addEventListener('click', () => {
+        switchView('roadmap');
+      });
+    }
+
     els.btnResultToDashboard.addEventListener('click', () => {
       switchView('dashboard');
     });

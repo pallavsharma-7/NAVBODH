@@ -803,6 +803,27 @@ router.post(['/study-assistant', '/intelligence/study-assistant'], requireAuth, 
         reply = `Congratulations ${officerName}! You currently have no active competency deficiencies against your official targets. ` +
           `You can maintain your expertise by exploring advanced coursework in the **Recommendations** tab.`;
       }
+    } else if (lowerQuery.includes('igot') || lowerQuery.includes('karmayogi') || lowerQuery.includes('course') || lowerQuery.includes('resource') || lowerQuery.includes('learn')) {
+      category = 'igot_course_guidance';
+      if (topGap) {
+        reply = `For your top deficiency in **${topGap.name}** (Gap: ${topGap.gap} pts):\n\n` +
+          `• **Primary Recommendation:** Dedicated modules in ${topGap.domain}\n` +
+          `• **iGOT karmayogi Action:** Use the **"Open in iGOT"** button on your personalized roadmap to open official learning content in a new tab.\n` +
+          `• **Expected Outcome:** ${getSuggestedFocus(topGap.code, topGap.domain)}\n\n` +
+          `Navigate to your **Roadmap** tab to launch courses directly on iGOT Karmayogi.`;
+      } else {
+        reply = `You can explore the full course catalog and iGOT Karmayogi recommendations from the **Learning** and **Roadmap** tabs.`;
+      }
+    } else if (lowerQuery.includes('why') || lowerQuery.includes('priority') || lowerQuery.includes('viz') || lowerQuery.includes('visualization') || lowerQuery.includes('next')) {
+      category = 'priority_explanation';
+      if (topGap) {
+        reply = `**Priority Explanation for ${topGap.name}:**\n\n` +
+          `• **Reason for High Priority:** Your current score is **${topGap.current}** against an official MoSPI benchmark target of **${topGap.target}** (a deficit of ${topGap.gap} points).\n` +
+          `• **Impact:** Bridging this gap is essential for operational performance in ${topGap.domain}.\n` +
+          `• **Next Learning Step:** Complete the recommended course for ${topGap.name} available in your **Roadmap** tab or on **iGOT Karmayogi**.`;
+      } else {
+        reply = `Your current competency scores meet or exceed all official MoSPI benchmark targets. You can pursue advanced elective courses on iGOT Karmayogi.`;
+      }
     } else if (lowerQuery.includes('gap') || lowerQuery.includes('deficiency') || lowerQuery.includes('weak') || lowerQuery.includes('score')) {
       category = 'gap_analysis';
       if (gaps.length > 0) {
@@ -822,7 +843,7 @@ router.post(['/study-assistant', '/intelligence/study-assistant'], requireAuth, 
           `• **Phase 1 (Urgent Remediation):** ${highGaps.length > 0 ? highGaps.map(g => g.name).join(', ') : 'None (No critical gaps)'}\n` +
           `• **Phase 2 (Core Enhancement):** ${gaps.filter(g => g.priority === 'medium').map(g => g.name).join(', ') || 'None'}\n` +
           `• **Phase 3 (Refinement):** ${gaps.filter(g => g.priority === 'low').map(g => g.name).join(', ') || 'None'}\n\n` +
-          `Check the **Roadmap** tab for step-by-step course mappings and milestone durations.`;
+          `Check the **Roadmap** tab for step-by-step course mappings, iGOT Karmayogi links, and milestone durations.`;
       } else {
         reply = `Your roadmap is currently in the **Mastery & Maintenance** phase because all competency targets have been satisfied.`;
       }
@@ -836,7 +857,7 @@ router.post(['/study-assistant', '/intelligence/study-assistant'], requireAuth, 
         reply = `Regarding **${matchedCompInGaps.name}**:\n` +
           `• Your current score is **${matchedCompInGaps.current}** against an official target of **${matchedCompInGaps.target}** (Gap: ${matchedCompInGaps.gap} pts, ${matchedCompInGaps.priority.toUpperCase()} priority).\n` +
           `• Suggested strategy: ${getSuggestedFocus(matchedCompInGaps.code, matchedCompInGaps.domain)}\n` +
-          `• Check your **Recommendations** tab for course modules mapped specifically to this skill.`;
+          `• Check your **Recommendations** and **Roadmap** tabs to open matched iGOT Karmayogi learning resources.`;
       } else if (matchedCompAll) {
         const cScore = Number(matchedCompAll.current_score || 0);
         const tScore = Number(matchedCompAll.target_score || 80.0);
@@ -853,15 +874,16 @@ router.post(['/study-assistant', '/intelligence/study-assistant'], requireAuth, 
     } else {
       category = 'general_assistance';
       if (topGap) {
-        reply = `Greetings ${officerName}. I am your NAVBODH Study Assistant.\n\n` +
+        reply = `Greetings ${officerName}. I am your NAVBODH AI Assistant.\n\n` +
           `Based on your profile in **${deptName}**, your primary learning objective is bridging the **${topGap.name}** competency gap (${topGap.gap} pts below target).\n\n` +
           `You can ask me questions like:\n` +
           `• *"What should I learn first?"*\n` +
-          `• *"Explain my skill gaps"*\n` +
-          `• *"Summarize my learning roadmap"*\n` +
-          `• *"How can I improve in SQL or Survey Sampling?"*`;
+          `• *"Why is ${topGap.name} marked as a high priority?"*\n` +
+          `• *"What are my biggest competency gaps?"*\n` +
+          `• *"Which course should I take for this gap?"*\n` +
+          `• *"Explain my roadmap."*`;
       } else {
-        reply = `Greetings ${officerName}. I am your NAVBODH Study Assistant. All your competency targets are currently on track. Feel free to ask about any statistical subject or explore advanced training in the **Recommendations** tab.`;
+        reply = `Greetings ${officerName}. I am your NAVBODH AI Assistant. All your competency targets are currently on track. Feel free to ask about any statistical subject or explore advanced training in the **Recommendations** tab.`;
       }
     }
 
